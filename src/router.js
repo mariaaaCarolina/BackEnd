@@ -27,6 +27,8 @@ router.delete("/companies/:id", companyController.deleteCompany);
 router.get("/curriculum", curriculumController.getAll);
 router.get("/curriculum/:id", curriculumController.getCurriculumById);
 router.post("/curriculum", curriculumController.createCurriculum);
+router.put("/curriculum/:id", curriculumController.updateCurriculum);
+router.delete("/curriculum/:id", curriculumController.deleteCurriculum);
 
 // Rotas para Vagas
 // router.get("/vagas", vagaController.getAll);

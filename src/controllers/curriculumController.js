@@ -30,4 +30,38 @@ const createCurriculum = async (req, res) => {
     }
 };
 
-module.exports = { getAll, getCurriculumById, createCurriculum };
+const updateCurriculum = async (req, res) => {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    try {
+        const response = await curriculumModel.updateCurriculum(
+            id,
+            updatedData
+        );
+        return res.status(200).json(response);
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "Erro ao atualizar o currículo." });
+    }
+};
+
+const deleteCurriculum = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const response = await curriculumModel.deleteCurriculum(id);
+        return res.status(200).json(response);
+    } catch (error) {
+        return res.status(500).json({ error: "Erro ao deletar o currículo." });
+    }
+};
+
+module.exports = {
+    getAll,
+    getCurriculumById,
+    createCurriculum,
+    updateCurriculum,
+    deleteCurriculum,
+};
