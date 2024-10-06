@@ -3,7 +3,18 @@ const connect = require("../connection");
 const getAll = async () => {
     try {
         const conn = await connect();
-        const [rows] = await conn.query("SELECT * FROM users");
+
+        const [rows] = await conn.query(`
+            SELECT 
+                users.id AS userId, 
+                users.name, 
+                users.cpf, 
+                users.email, 
+                users.phoneNumber, 
+                curriculum.id AS curriculumId 
+            FROM users 
+            LEFT JOIN curriculum ON users.id = curriculum.userId
+        `);
         return rows;
     } catch (error) {
         console.error("Database error: ", error);
@@ -28,22 +39,12 @@ const createUser = async (user) => {
             password,
             curriculumId,
             vacancyId,
-            userId,
         } = user;
 
         const [result] = await conn.query(
-            `INSERT INTO users (name, cpf, email, phoneNumber, password, curriculumId, vacancyId, userId) 
+            `INSERT INTO users (name, cpf, email, phoneNumber, password, curriculumId, vacancyId) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                name,
-                cpf,
-                email,
-                phoneNumber,
-                password,
-                curriculumId,
-                vacancyId,
-                userId,
-            ]
+            [name, cpf, email, phoneNumber, password, curriculumId, vacancyId]
         );
         return { id: result.insertId, ...user };
     } catch (error) {
@@ -54,20 +55,12 @@ const createUser = async (user) => {
 
 const updateUser = async (id, user) => {
     const conn = await connect();
-    const {
-        name,
-        cpf,
-        email,
-        phoneNumber,
-        password,
-        curriculumId,
-        vacancyId,
-        userId,
-    } = user;
+    const { name, cpf, email, phoneNumber, password, curriculumId, vacancyId } =
+        user;
 
     const query = `
         UPDATE users 
-        SET name = ?, cpf = ?, email = ?, phoneNumber = ?, password = ?, curriculumId = ?, vacancyId = ?, userId = ?
+        SET name = ?, cpf = ?, email = ?, phoneNumber = ?, password = ?, curriculumId = ?, vacancyId = ?
         WHERE id = ?
     `;
 
@@ -79,7 +72,6 @@ const updateUser = async (id, user) => {
         password,
         curriculumId,
         vacancyId,
-        userId,
         id,
     ]);
 
