@@ -2,7 +2,10 @@ const connect = require("../connection");
 
 const getAll = async () => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM curriculum");
+    const query = await conn.query(
+        `SELECT c.*, a.id AS academicDataId FROM curriculum c
+        LEFT JOIN academicData a ON c.id = a.curriculumId`
+    );
     return query[0];
 };
 
