@@ -3,8 +3,13 @@ const connect = require("../connection");
 const getAll = async () => {
     const conn = await connect();
     const query = await conn.query(
-        `SELECT c.*, a.id AS academicDataId FROM curriculum c
-        LEFT JOIN academicData a ON c.id = a.curriculumId`
+        `SELECT 
+            c.*, 
+            a.id AS academicDataId,
+            comp.id AS competenceId
+         FROM curriculum c
+         LEFT JOIN academicData a ON c.id = a.curriculumId
+         LEFT JOIN competences comp ON c.id = comp.curriculumId` //essa droga ta retornando null mesmo cadastrando a competencia
     );
     return query[0];
 };

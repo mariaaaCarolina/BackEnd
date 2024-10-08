@@ -5,8 +5,9 @@ const companyController = require("./controllers/companyController");
 const curriculumController = require("./controllers/curriculumController");
 const coursesDataController = require("./controllers/coursesDataController");
 const academicDataController = require("./controllers/academicDataController");
-
-// const vagaController = require("./controllers/vagaController");
+const competencesController = require("./controllers/competencesController");
+const vacancyController = require("./controllers/vacancyController");
+const { route } = require("./app");
 // const candidatoController = require("./controllers/candidatoController");
 
 const router = express.Router();
@@ -47,9 +48,17 @@ router.post("/courseData", coursesDataController.createCourseData);
 router.put("/courseData/:id", coursesDataController.updateCourseData);
 router.delete("/courseData/:id", coursesDataController.deleteCourseData);
 
+// Rotas para competencias do curriculo //funciona porém nem tanto
+router.get("/competences", competencesController.getAll);
+router.get("/competences/:id", competencesController.getCompetencesById);
+router.post("/competences", competencesController.createCompetence);
+
 // Rotas para Vagas
-// router.get("/vagas", vagaController.getAll);
-// router.post("/vagas", vagaController.createVaga);
+router.get("/vacancies", vacancyController.getAll);
+router.get("/vacancies/:id", vacancyController.getVacanciesById);
+router.post("/vacancy", vacancyController.createVacancy);
+router.put("/vacancy/:id", vacancyController.updateVacancy);
+router.delete("/vacancy/:id", vacancyController.deleteVacancy);
 
 // Rotas para Candidatos
 // router.get("/candidatos", candidatoController.getAll);
