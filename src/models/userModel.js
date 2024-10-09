@@ -32,6 +32,7 @@ const createUser = async (user) => {
     const conn = await connect();
     try {
         const {
+            id,
             name,
             cpf,
             email,
@@ -42,9 +43,18 @@ const createUser = async (user) => {
         } = user;
 
         const [result] = await conn.query(
-            `INSERT INTO users (name, cpf, email, phoneNumber, password, curriculumId, vacancyId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [name, cpf, email, phoneNumber, password, curriculumId, vacancyId]
+            `INSERT INTO users (id, name, cpf, email, phoneNumber, password, curriculumId, vacancyId) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+            [
+                id,
+                name,
+                cpf,
+                email,
+                phoneNumber,
+                password,
+                curriculumId,
+                vacancyId,
+            ]
         );
         return { id: result.insertId, ...user };
     } catch (error) {

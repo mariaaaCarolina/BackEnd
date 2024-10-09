@@ -10,6 +10,7 @@ const createCompany = async (company) => {
     const conn = await connect();
     try {
         const {
+            id,
             name,
             cnpj,
             segment,
@@ -27,9 +28,10 @@ const createCompany = async (company) => {
         } = company;
 
         const [result] = await conn.query(
-            `INSERT INTO companies (name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO companies (id, name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
+                id,
                 name,
                 cnpj,
                 segment,

@@ -16,6 +16,7 @@ const createVacancy = async (vacancy) => {
     const conn = await connect();
     try {
         const {
+            id,
             title,
             description,
             aboutCompany,
@@ -31,10 +32,11 @@ const createVacancy = async (vacancy) => {
         } = vacancy;
 
         const [result] = await conn.query(
-            `INSERT INTO vacancy (title, description, aboutCompany, benefits, 
+            `INSERT INTO vacancy (id, title, description, aboutCompany, benefits, 
             requirements, modality, locality, uf, contact, salary, level, companyId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
+                id,
                 title,
                 description,
                 aboutCompany,

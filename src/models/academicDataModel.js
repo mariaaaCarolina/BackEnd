@@ -18,6 +18,7 @@ const createAcademicData = async (academicData) => {
     const conn = await connect();
     try {
         const {
+            id,
             name,
             semester,
             startDate,
@@ -30,10 +31,11 @@ const createAcademicData = async (academicData) => {
         } = academicData;
 
         const [result] = await conn.query(
-            `INSERT INTO academicData (name, semester, startDate, endDate, isCurrentlyStudying, 
+            `INSERT INTO academicData (id, name, semester, startDate, endDate, isCurrentlyStudying, 
             institutionName, degree, city, curriculumId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
+                id,
                 name,
                 semester,
                 startDate,

@@ -7,7 +7,7 @@ const coursesDataController = require("./controllers/coursesDataController");
 const academicDataController = require("./controllers/academicDataController");
 const competencesController = require("./controllers/competencesController");
 const vacancyController = require("./controllers/vacancyController");
-const { route } = require("./app");
+// const { route } = require("./app");
 // const candidatoController = require("./controllers/candidatoController");
 
 const router = express.Router();

@@ -2,15 +2,7 @@ const connect = require("../connection");
 
 const getAll = async () => {
     const conn = await connect();
-    const query = await conn.query(
-        `SELECT 
-            c.*, 
-            a.id AS academicDataId,
-            comp.id AS competenceId
-         FROM curriculum c
-         LEFT JOIN academicData a ON c.id = a.curriculumId
-         LEFT JOIN competences comp ON c.id = comp.curriculumId` //essa droga ta retornando null mesmo cadastrando a competencia
-    );
+    const query = await conn.query(`SELECT * FROM curriculum;`);
     return query[0];
 };
 
@@ -26,6 +18,7 @@ const createCurriculum = async (curriculum) => {
     const conn = await connect();
     try {
         const {
+            id,
             dateOfBirth,
             age,
             gender,
@@ -47,11 +40,12 @@ const createCurriculum = async (curriculum) => {
         } = curriculum;
 
         const [result] = await conn.query(
-            `INSERT INTO curriculum (dateOfBirth, age, gender, race, city, 
+            `INSERT INTO curriculum (id, dateOfBirth, age, gender, race, city, 
             attached, description, schoolName, schoolYear, schoolCity, schoolStartDate, schoolEndDate, isCurrentlyStudying, 
             address, addressNumber, cep, uf, userId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
+                id,
                 dateOfBirth,
                 age,
                 gender,

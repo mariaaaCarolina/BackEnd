@@ -25,14 +25,14 @@ const getById = async (id) => {
 const createCompetence = async (competenceData) => {
     const conn = await connect();
     try {
-        const { name, curriculumId } = competenceData;
+        const { id, name, curriculumId } = competenceData;
 
         const [result] = await conn.query(
-            `INSERT INTO competences (name, curriculumId) 
-            VALUES (?, ?);`,
-            [name, curriculumId]
+            `INSERT INTO competences (id, name, curriculumId) 
+            VALUES (?, ?, ?);`,
+            [id, name, curriculumId]
         );
-
+        console.log("Competence Data:", competenceData);
         return { id: result.insertId, ...competenceData };
     } catch (error) {
         console.error("Erro ao criar dados da competência:", error.message);
