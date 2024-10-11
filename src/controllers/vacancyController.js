@@ -44,7 +44,9 @@ const updateVacancy = async (req, res) => {
         return res.status(200).json(updatedVacancy);
     } catch (error) {
         console.error("Erro ao atualizar vaga:", error.message);
-        return res.status(500).json({ error: "Erro ao atualizar a vaga." });
+        return res
+            .status(500)
+            .json({ error: "Erro ao atualizar a vaga teste." });
     }
 };
 

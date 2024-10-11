@@ -16,7 +16,6 @@ const createVacancy = async (vacancy) => {
     const conn = await connect();
     try {
         const {
-            id,
             title,
             description,
             aboutCompany,
@@ -32,11 +31,10 @@ const createVacancy = async (vacancy) => {
         } = vacancy;
 
         const [result] = await conn.query(
-            `INSERT INTO vacancy (id, title, description, aboutCompany, benefits, 
+            `INSERT INTO vacancy (title, description, aboutCompany, benefits, 
             requirements, modality, locality, uf, contact, salary, level, companyId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
-                id,
                 title,
                 description,
                 aboutCompany,
@@ -115,7 +113,7 @@ const updateVacancy = async (id, vacancyData) => {
         return { id, ...vacancyData };
     } catch (error) {
         console.error("Erro ao atualizar vaga:", error.message);
-        throw new Error("Erro ao atualizar a vaga.");
+        throw new Error("Erro ao atualizar a vaga.", error.message);
     }
 };
 

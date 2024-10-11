@@ -6,11 +6,12 @@ const getAll = async () => {
 
         const [rows] = await conn.query(`
             SELECT 
-                users.id AS userId, 
+                users.id AS id, 
                 users.name, 
                 users.cpf, 
                 users.email, 
                 users.phoneNumber, 
+                users.password,
                 curriculum.id AS curriculumId 
             FROM users 
             LEFT JOIN curriculum ON users.id = curriculum.userId
@@ -32,7 +33,6 @@ const createUser = async (user) => {
     const conn = await connect();
     try {
         const {
-            id,
             name,
             cpf,
             email,
@@ -43,18 +43,9 @@ const createUser = async (user) => {
         } = user;
 
         const [result] = await conn.query(
-            `INSERT INTO users (id, name, cpf, email, phoneNumber, password, curriculumId, vacancyId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
-            [
-                id,
-                name,
-                cpf,
-                email,
-                phoneNumber,
-                password,
-                curriculumId,
-                vacancyId,
-            ]
+            `INSERT INTO users (name, cpf, email, phoneNumber, password, curriculumId, vacancyId) 
+            VALUES (?, ?, ?, ?, ?, ?, ?);`,
+            [name, cpf, email, phoneNumber, password, curriculumId, vacancyId]
         );
         return { id: result.insertId, ...user };
     } catch (error) {

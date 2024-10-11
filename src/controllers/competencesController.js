@@ -32,10 +32,40 @@ const createCompetence = async (req, res) => {
     }
 };
 
+const updateCompetence = async (req, res) => {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    try {
+        const response = await competencesModel.updateCompetence(
+            id,
+            updatedData
+        );
+        return res.status(200).json(response);
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "Erro ao atualizar a competencia." });
+    }
+};
+
+const deleteCompetence = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const response = await competencesModel.deleteCompetence(id);
+        return res.status(200).json(response);
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "Erro ao deletar a competencia." });
+    }
+};
+
 module.exports = {
     getAll,
     getCompetencesById,
     createCompetence,
-    // updateCompetence,
-    // deleteCompetence,
+    updateCompetence,
+    deleteCompetence,
 };

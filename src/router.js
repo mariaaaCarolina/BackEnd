@@ -8,7 +8,7 @@ const academicDataController = require("./controllers/academicDataController");
 const competencesController = require("./controllers/competencesController");
 const vacancyController = require("./controllers/vacancyController");
 // const { route } = require("./app");
-// const candidatoController = require("./controllers/candidatoController");
+const applicationController = require("./controllers/applicationController");
 
 const router = express.Router();
 require("dotenv").config();
@@ -52,6 +52,8 @@ router.delete("/courseData/:id", coursesDataController.deleteCourseData);
 router.get("/competences", competencesController.getAll);
 router.get("/competences/:id", competencesController.getCompetencesById);
 router.post("/competences", competencesController.createCompetence);
+router.put("/competences/:id", competencesController.updateCompetence);
+router.delete("/competences/:id", competencesController.deleteCompetence);
 
 // Rotas para Vagas
 router.get("/vacancies", vacancyController.getAll);
@@ -60,9 +62,12 @@ router.post("/vacancy", vacancyController.createVacancy);
 router.put("/vacancy/:id", vacancyController.updateVacancy);
 router.delete("/vacancy/:id", vacancyController.deleteVacancy);
 
-// Rotas para Candidatos
-// router.get("/candidatos", candidatoController.getAll);
-// router.post("/candidatos", candidatoController.createCandidato);
+// Rotas para Candidatura
+router.get("/applications", applicationController.getAll);
+router.get("/applications/:id", applicationController.getApplicationById);
+router.post("/application", applicationController.createApplication);
+router.put("/application", applicationController.updateApplication);
+router.delete("/application", applicationController.deleteApplication);
 
 // router.post("/login", userController.loginUser);
 
