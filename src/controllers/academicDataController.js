@@ -19,7 +19,7 @@ const getAcademicDataById = async (req, res) => {
                 .status(404)
                 .json({ error: "Dados Acadêmicos não encontrados." });
         }
-        return res.status(200).json(curriculum);
+        return res.status(200).json(academicData);
     } catch (error) {
         return res
             .status(500)
