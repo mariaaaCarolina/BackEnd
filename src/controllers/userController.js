@@ -58,4 +58,18 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getAll, getUserById, createUser, updateUser, deleteUser };
+const addCurriculum = async (req, res) => {
+    const userId = req.params.id;
+
+    const result = await userModel.addCurriculum(userId, req.body);
+    return res.status(200).send();
+};
+
+module.exports = {
+    getAll,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser,
+    addCurriculum,
+};

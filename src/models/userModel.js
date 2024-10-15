@@ -12,7 +12,7 @@ const getAll = async () => {
                 users.email, 
                 users.phoneNumber, 
                 users.password,
-                curriculum.id AS curriculumId 
+                users.curriculumId AS curriculumId 
             FROM users 
             LEFT JOIN curriculum ON users.id = curriculum.userId
         `);
@@ -89,4 +89,18 @@ const deleteUser = async (id) => {
     return result;
 };
 
-module.exports = { getAll, getById, createUser, updateUser, deleteUser };
+const addCurriculum = async (userId, curriculumId) => {
+    const conn = await connect();
+    const query = "UPDATE users SET curriculumId = ? WHERE id = ?";
+    const [result] = await conn.query(query, [curriculumId, userId]);
+    return result;
+};
+
+module.exports = {
+    getAll,
+    getById,
+    createUser,
+    updateUser,
+    deleteUser,
+    addCurriculum,
+};

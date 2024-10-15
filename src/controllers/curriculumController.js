@@ -58,10 +58,18 @@ const deleteCurriculum = async (req, res) => {
     }
 };
 
+const addDataToCurriculum = async (req, res) => {
+    const id = req.params.id;
+
+    const response = await curriculumModel.addDataToCurriculum(id, req.body);
+    return res.status(200).send();
+};
+
 module.exports = {
     getAll,
     getCurriculumById,
     createCurriculum,
     updateCurriculum,
     deleteCurriculum,
+    addDataToCurriculum,
 };

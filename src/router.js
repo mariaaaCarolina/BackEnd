@@ -7,6 +7,7 @@ const coursesDataController = require("./controllers/coursesDataController");
 const academicDataController = require("./controllers/academicDataController");
 const competencesController = require("./controllers/competencesController");
 const vacancyController = require("./controllers/vacancyController");
+const questionsController = require("./controllers/questionsController");
 // const { route } = require("./app");
 const applicationController = require("./controllers/applicationController");
 
@@ -19,6 +20,7 @@ router.get("/users/:id", userController.getUserById);
 router.post("/users", userController.createUser);
 router.put("/users/:id", userController.updateUser);
 router.delete("/users/:id", userController.deleteUser);
+router.put("/users/:id/curriculum", userController.addCurriculum);
 
 // Rotas para Empresas
 router.get("/companies", companyController.getAll);
@@ -33,6 +35,7 @@ router.get("/curriculum/:id", curriculumController.getCurriculumById);
 router.post("/curriculum", curriculumController.createCurriculum);
 router.put("/curriculum/:id", curriculumController.updateCurriculum);
 router.delete("/curriculum/:id", curriculumController.deleteCurriculum);
+router.put("/curriculum/:id/addData", curriculumController.addDataToCurriculum);
 
 // Rotas para curriculo (academicData) pg2
 router.get("/academicData", academicDataController.getAll);
@@ -61,6 +64,17 @@ router.get("/vacancies/:id", vacancyController.getVacanciesById);
 router.post("/vacancy", vacancyController.createVacancy);
 router.put("/vacancy/:id", vacancyController.updateVacancy);
 router.delete("/vacancy/:id", vacancyController.deleteVacancy);
+
+// Rotas para Perguntas da vaga
+router.get("/vacancy/questions", questionsController.getAll);
+router.get("/vacancy/:id/questions/:id", questionsController.getById);
+router.post("/vacancy/questions", questionsController.createQuestion);
+router.put("/vacancy/:id/questions/:id", questionsController.updateQuestion);
+router.delete("/vacancy/:id/questions/:id", questionsController.deleteQuestion);
+router.get(
+    "/questions/vacancy/:vacancyId",
+    questionsController.getAllByVacancyId
+); // todas as perguntas relacionas a vaga pelo id
 
 // Rotas para Candidatura
 router.get("/applications", applicationController.getAll);

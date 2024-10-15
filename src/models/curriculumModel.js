@@ -151,11 +151,20 @@ const deleteCurriculum = async (id) => {
             throw new Error(`Currículo com ID ${id} não encontrado.`);
         }
 
-        return { message: `Currículo com ID ${id} foi removido com sucesso.` };
+        return { message: `Currículo com ID ${id} foi removido com sucesso. ` };
     } catch (error) {
         console.error("Erro ao deletar o currículo:", error.message);
         throw new Error("Erro ao deletar o currículo.");
     }
+};
+
+const addDataToCurriculum = async (userId, data) => {
+    const conn = await connect();
+    const { description, attached } = data;
+    const query =
+        "UPDATE curriculum SET description = ?, attached = ? WHERE id = ?";
+    const [result] = await conn.query(query, [description, attached, userId]);
+    return result;
 };
 
 module.exports = {
@@ -164,4 +173,5 @@ module.exports = {
     createCurriculum,
     deleteCurriculum,
     updateCurriculum,
+    addDataToCurriculum,
 };
