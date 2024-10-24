@@ -12,9 +12,8 @@ const getAll = async () => {
                 users.email, 
                 users.phoneNumber, 
                 users.password,
-                users.curriculumId AS curriculumId 
-            FROM users 
-            LEFT JOIN curriculum ON users.id = curriculum.userId
+                users.curriculumId AS curriculumId
+            FROM users
         `);
         return rows;
     } catch (error) {

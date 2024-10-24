@@ -10,6 +10,8 @@ const vacancyController = require("./controllers/vacancyController");
 const questionsController = require("./controllers/questionsController");
 // const { route } = require("./app");
 const applicationController = require("./controllers/applicationController");
+const answersController = require("./controllers/answersController");
+const messagesController = require("./controllers/messagesController");
 
 const router = express.Router();
 require("dotenv").config();
@@ -83,6 +85,22 @@ router.post("/application", applicationController.createApplication);
 router.put("/application", applicationController.updateApplication);
 router.delete("/application", applicationController.deleteApplication);
 
-// router.post("/login", userController.loginUser);
+//Rotas para respostas das perguntas da vaga
+router.get("/answers", answersController.getAll);
+router.get("/answer/:id", answersController.getById);
+router.post("/answer", answersController.createAnswer);
+router.put("/answer/:id", answersController.updateAnswer);
+router.delete("/answer/:id", answersController.deleteAnswer);
+router.get(
+    "/answers/question/:questionId",
+    answersController.getAllByQuestionId
+); // todas as respostas de uma pergunta x
+
+//Rotas para as mensagens do chat
+router.get("/messages", messagesController.getAll);
+router.get("/message/:id", messagesController.getById);
+router.post("/message", messagesController.createMessage);
+router.put("/message/:id", messagesController.updateMessage);
+router.delete("/message/:id", messagesController.deleteMessage);
 
 module.exports = router;

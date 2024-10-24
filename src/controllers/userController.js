@@ -60,9 +60,25 @@ const deleteUser = async (req, res) => {
 
 const addCurriculum = async (req, res) => {
     const userId = req.params.id;
+    const { curriculumId } = req.body;
 
-    const result = await userModel.addCurriculum(userId, req.body);
-    return res.status(200).send();
+    try {
+        const result = await userModel.addCurriculum(userId, curriculumId);
+        if (result.affectedRows > 0) {
+            return res
+                .status(200)
+                .send({ message: "Currículo atualizado com sucesso." });
+        } else {
+            return res.status(404).send({ message: "Usuário não encontrado." });
+        }
+    } catch (error) {
+        return res
+            .status(500)
+            .send({
+                message: "Erro ao atualizar currículo",
+                error: error.message,
+            });
+    }
 };
 
 module.exports = {
