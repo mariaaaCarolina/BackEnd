@@ -2,21 +2,22 @@ const connect = require("../connection");
 
 const getAll = async () => {
     const conn = await connect();
-    const query = await conn.query(`SELECT * FROM application;`);
+    const query = await conn.query("SELECT * FROM application;");
     return query[0];
 };
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM application WHERE id = ?", [
-        id,
-    ]);
-    return query[0][0];
+    const query = await conn.query(
+        "SELECT * FROM application WHERE userId = ?",
+        [id]
+    );
+    return query[0];
 };
 
 const checkExistence = async (table, id) => {
     const conn = await connect();
-    const [rows] = await conn.query(`SELECT id FROM ${table} WHERE id = ?`, [
+    const [rows] = await conn.query("SELECT id FROM ${table} WHERE id = ?", [
         id,
     ]);
     return rows.length > 0;
