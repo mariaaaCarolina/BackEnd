@@ -1,8 +1,5 @@
 const connect = require("../connection");
 
-//NAO FUNCIONA ESTA MERDA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//ele cria mas nao referencia o curriculumId no get
-
 const getAll = async () => {
     const conn = await connect();
     try {
@@ -16,10 +13,11 @@ const getAll = async () => {
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM competences WHERE id = ?", [
-        id,
-    ]);
-    return query[0][0];
+    const query = await conn.query(
+        "SELECT * FROM competences WHERE curriculumId = ?",
+        [id]
+    );
+    return query[0];
 };
 
 const createCompetence = async (competenceData) => {
@@ -46,7 +44,7 @@ const updateCompetence = async (id, competences) => {
         const { name, curriculumId } = competences;
 
         const [result] = await conn.query(
-            `UPDATE coursesData SET name = ?, curriculumId = ? WHERE id = ?;`,
+            "UPDATE coursesData SET name = ?, curriculumId = ? WHERE id = ?;",
             [name, curriculumId, id]
         );
         if (result.affectedRows === 0) {

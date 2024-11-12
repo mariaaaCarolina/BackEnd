@@ -1,4 +1,5 @@
 const connect = require("../connection");
+const bcrypt = require("bcrypt");
 
 const getAll = async () => {
     try {
@@ -28,6 +29,13 @@ const getById = async (id) => {
     return query[0][0]; // Retorna um único usuário
 };
 
+// const getUserByEmail = async (email) => {
+//     const conn = await connect();
+//     const [rows] = await conn.query("SELECT * FROM users WHERE email = ?", [
+//         email,
+//     ]);
+//     return rows[0];
+// };
 const createUser = async (user) => {
     const conn = await connect();
     try {
@@ -80,12 +88,17 @@ const updateUser = async (id, user) => {
 
 const deleteUser = async (id) => {
     const conn = await connect();
-    const query = `
-        DELETE FROM users 
-        WHERE id = ?
-    `;
-    const [result] = await conn.query(query, [id]);
-    return result;
+    try {
+        await conn.query("DELETE FROM messages WHERE sender_id = ?", [id]);
+        const [result] = await conn.query("DELETE FROM users WHERE id = ?", [
+            id,
+        ]);
+
+        return result;
+    } catch (error) {
+        console.error("Erro ao excluir usuário e suas mensagens:", error);
+        throw new Error("Erro ao excluir usuário e suas mensagens");
+    }
 };
 
 const addCurriculum = async (userId, curriculumId) => {
@@ -95,6 +108,31 @@ const addCurriculum = async (userId, curriculumId) => {
     return result;
 };
 
+const deleteUserData = async (userId, curriculumId, id) => {
+    const conn = await connect();
+    try {
+        await conn.query("DELETE FROM application WHERE userId = ?", [userId]);
+        await conn.query("DELETE FROM academicData WHERE curriculumId = ?", [
+            curriculumId,
+        ]);
+        await conn.query("DELETE FROM competences WHERE curriculumId = ?", [
+            curriculumId,
+        ]);
+        await conn.query("DELETE FROM coursesData WHERE curriculumId = ?", [
+            curriculumId,
+        ]);
+        await conn.query("DELETE FROM curriculum WHERE id = ?", [curriculumId]);
+
+        await conn.query("UPDATE users SET curriculumId = NULL WHERE id = ?", [
+            userId,
+        ]);
+        return { message: "Dados excluídos com sucesso." };
+    } catch (error) {
+        console.error("Erro ao excluir dados:", error);
+        throw new Error("Erro ao excluir dados do usuário");
+    }
+};
+
 module.exports = {
     getAll,
     getById,
@@ -102,4 +140,5 @@ module.exports = {
     updateUser,
     deleteUser,
     addCurriculum,
+    deleteUserData,
 };

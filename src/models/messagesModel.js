@@ -16,10 +16,10 @@ const getById = async (id) => {
 
 const createMessage = async (messageData) => {
     const conn = await connect();
-    const { sender_id, content } = messageData;
+    const { sender_id, content, sender_name } = messageData;
     const [result] = await conn.query(
-        `INSERT INTO messages (sender_id, content) VALUES (?, ?)`,
-        [sender_id, content]
+        `INSERT INTO messages (sender_id, content, sender_name) VALUES (?, ?, ?)`,
+        [sender_id, content, sender_name]
     );
     console.log("Message Data:", messageData);
     return { id: result.insertId, ...messageData };
@@ -28,11 +28,11 @@ const createMessage = async (messageData) => {
 const updateMessage = async (id, message) => {
     const conn = await connect();
     try {
-        const { sender_id, content } = message;
+        const { sender_id, content, sender_name } = message;
 
         const [result] = await conn.query(
-            `UPDATE messages SET sender_id = ?, content = ? WHERE id = ?;`,
-            [sender_id, content, id]
+            `UPDATE messages SET sender_id = ?, content = ?, sender_name = ? WHERE id = ?;`,
+            [sender_id, content, sender_name, id]
         );
         if (result.affectedRows === 0) {
             throw new Error(`Mensagem com ID ${id} não encontrado.`);

@@ -1,8 +1,9 @@
+const { query } = require("express");
 const connect = require("../connection");
 
 const getAll = async () => {
     const conn = await connect();
-    const query = await conn.query(`SELECT * FROM curriculum;`);
+    const query = await conn.query("SELECT * FROM curriculum;");
     return query[0];
 };
 
@@ -30,20 +31,15 @@ const createCurriculum = async (curriculum) => {
             uf,
             attached,
             description,
-            schoolName,
-            schoolYear,
-            schoolCity,
-            schoolStartDate,
-            schoolEndDate,
-            isCurrentlyStudying,
+
             userId,
         } = curriculum;
 
         const [result] = await conn.query(
             `INSERT INTO curriculum (id, dateOfBirth, age, gender, race, city, 
-            attached, description, schoolName, schoolYear, schoolCity, schoolStartDate, schoolEndDate, isCurrentlyStudying, 
+            attached, description,  
             address, addressNumber, cep, uf, userId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 id,
                 dateOfBirth,
@@ -53,12 +49,6 @@ const createCurriculum = async (curriculum) => {
                 city,
                 attached,
                 description,
-                schoolName,
-                schoolYear,
-                schoolCity,
-                schoolStartDate,
-                schoolEndDate,
-                isCurrentlyStudying,
                 address,
                 addressNumber,
                 cep,
@@ -90,19 +80,12 @@ const updateCurriculum = async (id, updatedCurriculum) => {
             uf,
             attached,
             description,
-            schoolName,
-            schoolYear,
-            schoolCity,
-            schoolStartDate,
-            schoolEndDate,
-            isCurrentlyStudying,
         } = updatedCurriculum;
 
         const [result] = await conn.query(
             `UPDATE curriculum 
             SET dateOfBirth = ?, age = ?, gender = ?, race = ?, city = ?, address = ?, addressNumber = ?, 
-            cep = ?, uf = ?, attached = ?, description = ?, schoolName = ?, schoolYear = ?, schoolCity = ?, 
-            schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ? 
+            cep = ?, uf = ?, attached = ?, description = ? 
             WHERE id = ?`,
             [
                 dateOfBirth,
@@ -116,12 +99,6 @@ const updateCurriculum = async (id, updatedCurriculum) => {
                 uf,
                 attached,
                 description,
-                schoolName,
-                schoolYear,
-                schoolCity,
-                schoolStartDate,
-                schoolEndDate,
-                isCurrentlyStudying,
                 id,
             ]
         );
@@ -151,11 +128,37 @@ const deleteCurriculum = async (id) => {
             throw new Error(`Currículo com ID ${id} não encontrado.`);
         }
 
-        return { message: `Currículo com ID ${id} foi removido com sucesso. ` };
+        return { message: `Currículo com ID ${id} foi removido com sucesso.` };
     } catch (error) {
         console.error("Erro ao deletar o currículo:", error.message);
         throw new Error("Erro ao deletar o currículo.");
     }
+};
+
+const addSchoolData = async (userId, data) => {
+    const conn = await connect();
+    const {
+        schoolName,
+        schoolYear,
+        schoolCity,
+        schoolStartDate,
+        schoolEndDate,
+        isCurrentlyStudying,
+    } = data;
+
+    const query = await conn.query(
+        "UPDATE curriculum SET schoolName = ?, schoolYear = ?, schoolCity = ?, schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ? WHERE id = ? ",
+        [
+            schoolName,
+            schoolYear,
+            schoolCity,
+            schoolStartDate,
+            schoolEndDate,
+            isCurrentlyStudying,
+            userId,
+        ]
+    );
+    return query[0];
 };
 
 const addDataToCurriculum = async (userId, data) => {
@@ -174,4 +177,5 @@ module.exports = {
     deleteCurriculum,
     updateCurriculum,
     addDataToCurriculum,
+    addSchoolData,
 };

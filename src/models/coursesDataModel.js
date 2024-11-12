@@ -8,10 +8,11 @@ const getAll = async () => {
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM coursesData WHERE id = ?", [
-        id,
-    ]);
-    return query[0][0];
+    const query = await conn.query(
+        "SELECT * FROM coursesData WHERE curriculumId = ?",
+        [id]
+    );
+    return query[0];
 };
 
 const createCourseData = async (courseData) => {

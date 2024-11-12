@@ -8,10 +8,11 @@ const getAll = async () => {
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM academicData WHERE id = ?", [
-        id,
-    ]);
-    return query[0][0];
+    const query = await conn.query(
+        "SELECT * FROM academicData WHERE curriculumId = ?",
+        [id]
+    );
+    return query[0];
 };
 
 const createAcademicData = async (academicData) => {
@@ -72,7 +73,7 @@ const updateAcademicData = async (id, academicData) => {
             `UPDATE academicData 
             SET name = ?, semester = ?, startDate = ?, endDate = ?, isCurrentlyStudying = ?, 
                 institutionName = ?, degree = ?, city = ?, curriculumId = ? 
-            WHERE id = ?;`,
+            WHERE curriculumId = ?;`,
             [
                 name,
                 semester,

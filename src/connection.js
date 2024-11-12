@@ -3,8 +3,7 @@ const fs = require("fs");
 require("dotenv").config();
 
 const connect = async () => {
-    const path =
-        "C:\\Microsoft VS Code\\BackEnd\\src\\DigiCertGlobalRootG2.crt.pem"; //alterar o caminho conforme onde o certificado está
+    const path = "./src/DigiCertGlobalRootG2.crt.pem"; //alterar o caminho conforme onde o certificado está
 
     try {
         const ca = fs.readFileSync(path, "utf8");

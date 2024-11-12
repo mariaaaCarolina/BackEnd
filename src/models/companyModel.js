@@ -117,10 +117,29 @@ const deleteCompany = async (id) => {
     return result;
 };
 
+// const deleteCompanieData = async (companyId) => {
+//     const conn = await connect();
+//     try {
+//         await conn.query("DELETE FROM application WHERE companyId = ?", [
+//             companyId,
+//         ]);
+//         await conn.query("DELETE FROM vacancy WHERE companyId = ?", [
+//             companyId,
+//         ]);
+//         await conn.query("DELETE FROM company WHERE id = ?", [companyId]);
+
+//         return { message: "Dados excluídos com sucesso." };
+//     } catch (error) {
+//         console.error("Erro ao excluir dados:", error);
+//         throw new Error("Erro ao excluir dados do usuário");
+//     }
+// };
+
 module.exports = {
     getAll,
     createCompany,
     getById,
     updateCompany,
     deleteCompany,
+    // deleteCompanieData,
 };
