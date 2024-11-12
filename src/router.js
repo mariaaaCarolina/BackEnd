@@ -31,6 +31,7 @@ router.get("/companies/:id", companyController.getCompanyById);
 router.post("/companies", companyController.createCompany);
 router.put("/companies/:id", companyController.updateCompany);
 router.delete("/companies/:id", companyController.deleteCompany);
+router.delete("/company/:id", companyController.deleteCompanyData);
 
 // Rotas para curriculum pg1 + dados escolares + pg4
 router.get("/curriculum", curriculumController.getAll);

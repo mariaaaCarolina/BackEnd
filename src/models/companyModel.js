@@ -117,23 +117,57 @@ const deleteCompany = async (id) => {
     return result;
 };
 
-// const deleteCompanieData = async (companyId) => {
-//     const conn = await connect();
-//     try {
-//         await conn.query("DELETE FROM application WHERE companyId = ?", [
-//             companyId,
-//         ]);
-//         await conn.query("DELETE FROM vacancy WHERE companyId = ?", [
-//             companyId,
-//         ]);
-//         await conn.query("DELETE FROM company WHERE id = ?", [companyId]);
+const deleteCompanyData = async (companyId) => {
+    const conn = await connect();
+    try {
+        // todos `vacancyId` relacionados
+        const [vacancies] = await conn.query(
+            "SELECT id FROM vacancy WHERE companyId = ?",
+            [companyId]
+        );
+        const vacancyIds = vacancies.map((vacancy) => vacancy.id);
 
-//         return { message: "Dados excluídos com sucesso." };
-//     } catch (error) {
-//         console.error("Erro ao excluir dados:", error);
-//         throw new Error("Erro ao excluir dados do usuário");
-//     }
-// };
+        if (vacancyIds.length > 0) {
+            // todos as `questionId` associadas às vagas da empresa
+            const [questions] = await conn.query(
+                "SELECT id FROM questions WHERE vacancyId IN (?)",
+                [vacancyIds]
+            );
+            const questionIds = questions.map((question) => question.id);
+
+            if (questionIds.length > 0) {
+                // respostas associadas às perguntas
+                await conn.query(
+                    "DELETE FROM answers WHERE questionId IN (?)",
+                    [questionIds]
+                );
+
+                // perguntas associadas às vagas
+                await conn.query("DELETE FROM questions WHERE id IN (?)", [
+                    questionIds,
+                ]);
+            }
+
+            // candidaturas associadas às vagas
+            await conn.query("DELETE FROM application WHERE vacancyId IN (?)", [
+                vacancyIds,
+            ]);
+
+            // vagas da empresa
+            await conn.query("DELETE FROM vacancy WHERE companyId = ?", [
+                companyId,
+            ]);
+        }
+
+        // empresa
+        await conn.query("DELETE FROM companies WHERE id = ?", [companyId]);
+
+        return { message: "Dados excluídos com sucesso." };
+    } catch (error) {
+        console.error("Erro ao excluir dados:", error);
+        throw new Error("Erro ao excluir dados da empresa");
+    }
+};
 
 module.exports = {
     getAll,
@@ -141,5 +175,5 @@ module.exports = {
     getById,
     updateCompany,
     deleteCompany,
-    // deleteCompanieData,
+    deleteCompanyData,
 };

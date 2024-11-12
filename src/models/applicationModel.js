@@ -17,10 +17,19 @@ const getById = async (id) => {
 
 const checkExistence = async (table, id) => {
     const conn = await connect();
-    const [rows] = await conn.query("SELECT id FROM ${table} WHERE id = ?", [
-        id,
-    ]);
-    return rows.length > 0;
+    try {
+        const [rows] = await conn.query("SELECT id FROM ?? WHERE id = ?", [
+            table,
+            id,
+        ]);
+        return rows.length > 0;
+    } catch (error) {
+        console.error(
+            `Erro ao verificar existência na tabela ${table}:`,
+            error.message
+        );
+        throw new Error(`Erro ao verificar existência na tabela ${table}`);
+    }
 };
 
 const createApplication = async (applicationData) => {

@@ -61,10 +61,23 @@ const deleteCompany = async (req, res) => {
     }
 };
 
+const deleteCompanyData = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await companyModel.deleteCompanyData(id);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Erro ao excluir dados da empresa:", error);
+        res.status(500).json({ error: "Erro ao excluir dados da empresa" });
+    }
+};
+
 module.exports = {
     getAll,
     createCompany,
     getCompanyById,
     updateCompany,
     deleteCompany,
+    deleteCompanyData,
 };

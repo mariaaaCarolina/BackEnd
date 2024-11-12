@@ -73,47 +73,61 @@ const updateVacancy = async (id, vacancyData) => {
             salary,
             level,
             companyId,
+            isActive, // é opcional passar
+            isFilled, // é opcional passar
         } = vacancyData;
 
-        const [result] = await conn.query(
-            `UPDATE vacancy SET 
-                title = ?, 
-                description = ?, 
-                aboutCompany = ?, 
-                benefits = ?, 
-                requirements = ?, 
-                modality = ?, 
-                locality = ?, 
-                uf = ?, 
-                contact = ?, 
-                salary = ?, 
-                level = ?, 
-                companyId = ? 
-            WHERE id = ?;`,
-            [
-                title,
-                description,
-                aboutCompany,
-                benefits,
-                requirements,
-                modality,
-                locality,
-                uf,
-                contact,
-                salary,
-                level,
-                companyId,
-                id,
-            ]
-        );
+        const fields = [
+            title,
+            description,
+            aboutCompany,
+            benefits,
+            requirements,
+            modality,
+            locality,
+            uf,
+            contact,
+            salary,
+            level,
+            companyId,
+        ];
+        let query = `UPDATE vacancy SET 
+            title = ?, 
+            description = ?, 
+            aboutCompany = ?, 
+            benefits = ?, 
+            requirements = ?, 
+            modality = ?, 
+            locality = ?, 
+            uf = ?, 
+            contact = ?, 
+            salary = ?, 
+            level = ?, 
+            companyId = ?`;
+
+        // Verifica se isActive e isFilled foram passados para atualizar
+        if (isActive !== undefined) {
+            query += `, isActive = ?`;
+            fields.push(isActive);
+        }
+        if (isFilled !== undefined) {
+            query += `, isFilled = ?`;
+            fields.push(isFilled);
+        }
+
+        query += ` WHERE id = ?;`;
+        fields.push(id);
+
+        const [result] = await conn.query(query, fields);
+
         if (result.affectedRows === 0) {
-            throw new Error(`Vaga com ID ${id} não encontrado.`);
+            throw new Error(`Vaga com ID ${id} não encontrada.`);
         }
 
         return { id, ...vacancyData };
     } catch (error) {
         console.error("Erro ao atualizar vaga:", error.message);
-        throw new Error("Erro ao atualizar a vaga.", error.message);
+        throw new Error("Erro ao atualizar a vaga.");
     }
 };
 
