@@ -73,7 +73,7 @@ const updateAcademicData = async (id, academicData) => {
             `UPDATE academicData 
             SET name = ?, semester = ?, startDate = ?, endDate = ?, isCurrentlyStudying = ?, 
                 institutionName = ?, degree = ?, city = ?, curriculumId = ? 
-            WHERE curriculumId = ?;`,
+            WHERE id = ?;`,
             [
                 name,
                 semester,
