@@ -36,6 +36,7 @@ const getById = async (id) => {
 //     ]);
 //     return rows[0];
 // };
+
 const createUser = async (user) => {
     const conn = await connect();
     try {

@@ -40,6 +40,7 @@ router.post("/curriculum", curriculumController.createCurriculum);
 router.put("/curriculum/:id", curriculumController.updateCurriculum);
 router.delete("/curriculum/:id", curriculumController.deleteCurriculum);
 router.put("/curriculum/:id/addData", curriculumController.addDataToCurriculum);
+router.put("/curriculum/:id/addSchoolData", curriculumController.addSchoolData);
 
 // Rotas para curriculo (academicData) pg2
 router.get("/academicData", academicDataController.getAll);
