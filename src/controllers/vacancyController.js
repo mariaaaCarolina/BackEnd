@@ -50,6 +50,47 @@ const updateVacancy = async (req, res) => {
     }
 };
 
+const updateIsActive = async (req, res) => {
+    const { id } = req.params;
+    const { isActive } = req.body;
+    if (typeof isActive !== "boolean") {
+        return res
+            .status(400)
+            .json({ error: "O campo 'isActive' deve ser um valor booleano." });
+    }
+
+    try {
+        const result = await vacancyModel.updateIsActive(id, isActive);
+        res.status(200).json({
+            message: `Status da vaga com ID ${id} atualizado com sucesso.`,
+            vacancy: result,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const updateIsFilled = async (req, res) => {
+    const { id } = req.params;
+    const { isFilled } = req.body;
+
+    if (typeof isFilled !== "boolean") {
+        return res
+            .status(400)
+            .json({ error: "O campo 'isFilled' deve ser um valor booleano." });
+    }
+
+    try {
+        const result = await vacancyModel.updateIsFilled(id, isFilled);
+        res.status(200).json({
+            message: `Status de preenchimento da vaga com ID ${id} atualizado com sucesso.`,
+            vacancy: result,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 const deleteVacancy = async (req, res) => {
     const { id } = req.params;
     try {
@@ -67,4 +108,6 @@ module.exports = {
     createVacancy,
     updateVacancy,
     deleteVacancy,
+    updateIsActive,
+    updateIsFilled,
 };

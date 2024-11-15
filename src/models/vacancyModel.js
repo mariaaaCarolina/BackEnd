@@ -73,52 +73,38 @@ const updateVacancy = async (id, vacancyData) => {
             salary,
             level,
             companyId,
-            isActive, // é opcional passar
-            isFilled, // é opcional passar
         } = vacancyData;
-
-        const fields = [
-            title,
-            description,
-            aboutCompany,
-            benefits,
-            requirements,
-            modality,
-            locality,
-            uf,
-            contact,
-            salary,
-            level,
-            companyId,
-        ];
-        let query = `UPDATE vacancy SET 
-            title = ?, 
-            description = ?, 
-            aboutCompany = ?, 
-            benefits = ?, 
-            requirements = ?, 
-            modality = ?, 
-            locality = ?, 
-            uf = ?, 
-            contact = ?, 
-            salary = ?, 
-            level = ?, 
-            companyId = ?`;
-
-        // Verifica se isActive e isFilled foram passados para atualizar
-        if (isActive !== undefined) {
-            query += `, isActive = ?`;
-            fields.push(isActive);
-        }
-        if (isFilled !== undefined) {
-            query += `, isFilled = ?`;
-            fields.push(isFilled);
-        }
-
-        query += ` WHERE id = ?;`;
-        fields.push(id);
-
-        const [result] = await conn.query(query, fields);
+        const [result] = await conn.query(
+            `UPDATE vacancy SET 
+                title = ?, 
+                description = ?, 
+                aboutCompany = ?, 
+                benefits = ?, 
+                requirements = ?, 
+                modality = ?, 
+                locality = ?, 
+                uf = ?, 
+                contact = ?, 
+                salary = ?, 
+                level = ?, 
+                companyId = ? 
+            WHERE id = ?;`,
+            [
+                title,
+                description,
+                aboutCompany,
+                benefits,
+                requirements,
+                modality,
+                locality,
+                uf,
+                contact,
+                salary,
+                level,
+                companyId,
+                id,
+            ]
+        );
 
         if (result.affectedRows === 0) {
             throw new Error(`Vaga com ID ${id} não encontrada.`);
@@ -128,6 +114,47 @@ const updateVacancy = async (id, vacancyData) => {
     } catch (error) {
         console.error("Erro ao atualizar vaga:", error.message);
         throw new Error("Erro ao atualizar a vaga.");
+    }
+};
+
+const updateIsActive = async (id, isActive) => {
+    const conn = await connect();
+    try {
+        const [result] = await conn.query(
+            `UPDATE vacancy SET isActive = ? WHERE id = ?;`,
+            [isActive, id]
+        );
+
+        if (result.affectedRows === 0) {
+            throw new Error(`Vaga com ID ${id} não encontrada.`);
+        }
+
+        return { id, isActive };
+    } catch (error) {
+        console.error("Erro ao atualizar o status da vaga:", error.message);
+        throw new Error("Erro ao atualizar o status da vaga.");
+    }
+};
+
+const updateIsFilled = async (id, isFilled) => {
+    const conn = await connect();
+    try {
+        const [result] = await conn.query(
+            `UPDATE vacancy SET isFilled = ? WHERE id = ?;`,
+            [isFilled, id]
+        );
+
+        if (result.affectedRows === 0) {
+            throw new Error(`Vaga com ID ${id} não encontrada.`);
+        }
+
+        return { id, isFilled };
+    } catch (error) {
+        console.error(
+            "Erro ao atualizar o status de preenchimento da vaga:",
+            error.message
+        );
+        throw new Error("Erro ao atualizar o status de preenchimento da vaga.");
     }
 };
 
@@ -155,4 +182,6 @@ module.exports = {
     createVacancy,
     updateVacancy,
     deleteVacancy,
+    updateIsActive,
+    updateIsFilled,
 };
