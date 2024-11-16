@@ -6,7 +6,7 @@ const getAll = async () => {
     return query[0];
 };
 
-const createCompany = async (company) => {
+const createCompany = async (req, res) => {
     const conn = await connect();
     try {
         const {
@@ -23,12 +23,14 @@ const createCompany = async (company) => {
             uf,
             password,
             url,
-            logo,
-        } = company;
+        } = req.body;
+
+        // caminho para o arquivo armazenado no servidor
+        const logo = req.file ? `/uploads/images/${req.file.filename}` : null;
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name,
                 cnpj,
@@ -46,10 +48,11 @@ const createCompany = async (company) => {
                 logo,
             ]
         );
-        return { id: result.insertId, ...company };
+
+        return res.json({ id: result.insertId, ...req.body, logo });
     } catch (error) {
         console.error("Erro ao criar a empresa:", error.message);
-        throw new Error("Erro ao criar a empresa");
+        return res.status(500).json({ error: "Erro ao criar a empresa" });
     }
 };
 
@@ -61,50 +64,60 @@ const getById = async (id) => {
     return query[0][0]; // Retorna um único usuário
 };
 
-const updateCompany = async (id, company) => {
+const updateCompany = async (req, res) => {
     const conn = await connect();
-    const {
-        name,
-        cnpj,
-        segment,
-        responsible,
-        email,
-        phoneNumber,
-        city,
-        cep,
-        address,
-        addressNumber,
-        uf,
-        password,
-        url,
-        logo,
-    } = company;
+    try {
+        const { id } = req.params;
+        const {
+            name,
+            cnpj,
+            segment,
+            responsible,
+            email,
+            phoneNumber,
+            city,
+            cep,
+            address,
+            addressNumber,
+            uf,
+            password,
+            url,
+        } = req.body;
 
-    const query = `
-        UPDATE companies
-        SET name = ?, cnpj = ?, segment = ?, responsible = ?, email = ?, phoneNumber = ?, city = ?, cep = ?, address = ?, addressNumber = ?, uf = ?, password = ?, url = ?, logo = ?
-        WHERE id = ?
-    `;
+        // caminho do novo arquivo ou o anterior caso não tenha sido enviado
+        const logo = req.file
+            ? `/uploads/images/${req.file.filename}`
+            : req.body.logo;
 
-    const [result] = await conn.query(query, [
-        name,
-        cnpj,
-        segment,
-        responsible,
-        email,
-        phoneNumber,
-        city,
-        cep,
-        address,
-        addressNumber,
-        uf,
-        password,
-        url,
-        logo,
-        id,
-    ]);
+        const query = `
+            UPDATE companies
+            SET name = ?, cnpj = ?, segment = ?, responsible = ?, email = ?, phoneNumber = ?, city = ?, cep = ?, address = ?, addressNumber = ?, uf = ?, password = ?, url = ?, logo = ?
+            WHERE id = ?
+        `;
 
-    return result.affectedRows ? { id, ...company } : null;
+        const [result] = await conn.query(query, [
+            name,
+            cnpj,
+            segment,
+            responsible,
+            email,
+            phoneNumber,
+            city,
+            cep,
+            address,
+            addressNumber,
+            uf,
+            password,
+            url,
+            logo,
+            id,
+        ]);
+
+        return res.json(result.affectedRows ? { id, ...req.body, logo } : null);
+    } catch (error) {
+        console.error("Erro ao atualizar a empresa:", error.message);
+        return res.status(500).json({ error: "Erro ao atualizar a empresa" });
+    }
 };
 
 const deleteCompany = async (id) => {
