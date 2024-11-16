@@ -67,7 +67,6 @@ const getById = async (id) => {
 const updateCompany = async (req, res) => {
     const conn = await connect();
     try {
-        const { id } = req.params;
         const {
             name,
             cnpj,
