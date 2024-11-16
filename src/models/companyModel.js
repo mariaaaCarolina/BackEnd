@@ -6,7 +6,7 @@ const getAll = async () => {
     return query[0];
 };
 
-const createCompany = async (req, res) => {
+const createCompany = async (company) => {
     const conn = await connect();
     try {
         const {
@@ -23,14 +23,12 @@ const createCompany = async (req, res) => {
             uf,
             password,
             url,
-        } = req.body;
-
-        // caminho para o arquivo armazenado no servidor
-        const logo = req.file ? `/uploads/images/${req.file.filename}` : null;
+            logo,
+        } = company;
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name,
                 cnpj,
@@ -48,11 +46,10 @@ const createCompany = async (req, res) => {
                 logo,
             ]
         );
-
-        return res.json({ id: result.insertId, ...req.body, logo });
+        return { id: result.insertId, ...company };
     } catch (error) {
         console.error("Erro ao criar a empresa:", error.message);
-        return res.status(500).json({ error: "Erro ao criar a empresa" });
+        throw new Error("Erro ao criar a empresa");
     }
 };
 
@@ -64,9 +61,10 @@ const getById = async (id) => {
     return query[0][0]; // Retorna um único usuário
 };
 
-const updateCompany = async (req, res) => {
-    const conn = await connect();
+const updateCompany = async (id, company) => {
+    let conn;
     try {
+        conn = await connect();
         const {
             name,
             cnpj,
@@ -81,12 +79,8 @@ const updateCompany = async (req, res) => {
             uf,
             password,
             url,
-        } = req.body;
-
-        // caminho do novo arquivo ou o anterior caso não tenha sido enviado
-        const logo = req.file
-            ? `/uploads/images/${req.file.filename}`
-            : req.body.logo;
+            logo,
+        } = company;
 
         const query = `
             UPDATE companies
@@ -112,10 +106,12 @@ const updateCompany = async (req, res) => {
             id,
         ]);
 
-        return res.json(result.affectedRows ? { id, ...req.body, logo } : null);
-    } catch (error) {
-        console.error("Erro ao atualizar a empresa:", error.message);
-        return res.status(500).json({ error: "Erro ao atualizar a empresa" });
+        console.log("Query result:", result);
+
+        return result.affectedRows ? { id, ...company } : null;
+    } catch (err) {
+        console.error("Error during database query:", err);
+        throw new Error("Database query execution failed");
     }
 };
 

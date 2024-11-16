@@ -14,7 +14,6 @@ const answersController = require("./controllers/answersController");
 const messagesController = require("./controllers/messagesController");
 
 const router = express.Router();
-const { uploadLogo } = require("./upload");
 require("dotenv").config();
 
 //Rotas para Usuários
