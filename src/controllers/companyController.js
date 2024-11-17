@@ -23,17 +23,19 @@ const getCompanyById = async (req, res) => {
 
 const createCompany = async (req, res) => {
     try {
-        const companyData = { ...req.body };
+        const companyData = req.body;
 
-        if (req.file) {
-            companyData.logo = req.file.filename;
-        }
-        const newCompany = await companyModel.createCompany(companyData);
+        const logoFilename = req.file.filename;
 
-        return res.status(201).json(newCompany);
+        const newCompany = await companyModel.createCompany(
+            companyData,
+            logoFilename
+        );
+
+        res.status(201).json(newCompany);
     } catch (error) {
-        console.error("Erro no controller ao criar empresa:", error.message);
-        return res.status(500).json({ error: "Erro ao criar empresa." });
+        console.error("Erro no controlador ao criar a empresa:", error.message);
+        res.status(500).json({ error: "Erro ao criar a empresa." });
     }
 };
 

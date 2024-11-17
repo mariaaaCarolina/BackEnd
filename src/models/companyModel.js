@@ -6,7 +6,7 @@ const getAll = async () => {
     return query[0];
 };
 
-const createCompany = async (company) => {
+const createCompany = async (company, logoFilename) => {
     const conn = await connect();
     try {
         const normalizedCompany = { ...company };
@@ -25,8 +25,12 @@ const createCompany = async (company) => {
             uf,
             password,
             url,
-            logo,
         } = normalizedCompany;
+
+        const logoUrl = `${
+            process.env.BASE_URL ||
+            "https://backend-production-ff1f.up.railway.app"
+        }/images/${logoFilename}`;
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
@@ -45,11 +49,11 @@ const createCompany = async (company) => {
                 uf,
                 password,
                 url,
-                logo,
+                logoUrl,
             ]
         );
 
-        return { id: result.insertId, ...normalizedCompany };
+        return { id: result.insertId, ...normalizedCompany, logo: logoUrl };
     } catch (error) {
         console.error("Erro ao criar a empresa:", error.message);
         throw new Error("Erro ao criar a empresa.");
@@ -58,10 +62,11 @@ const createCompany = async (company) => {
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM companies WHERE id = ?", [
+    const [rows] = await conn.query("SELECT * FROM companies WHERE id = ?", [
         id,
     ]);
-    return query[0][0];
+    if (rows.length === 0) throw new Error("Empresa não encontrada.");
+    return rows[0];
 };
 
 const updateCompany = async (id, company) => {
