@@ -8,13 +8,54 @@ const academicDataController = require("./controllers/academicDataController");
 const competencesController = require("./controllers/competencesController");
 const vacancyController = require("./controllers/vacancyController");
 const questionsController = require("./controllers/questionsController");
-// const { route } = require("./app");
 const applicationController = require("./controllers/applicationController");
 const answersController = require("./controllers/answersController");
 const messagesController = require("./controllers/messagesController");
-
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
 require("dotenv").config();
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, "../public/images/"));
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + "-" + file.originalname);
+    },
+});
+const uploads = multer({ storage });
+
+const storage2 = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "public/attachments/");
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    },
+});
+
+const upload = multer({
+    storage: storage2,
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = /pdf|docx|doc|txt/;
+        const extname = allowedTypes.test(
+            path.extname(file.originalname).toLowerCase()
+        );
+        const mimetype = allowedTypes.test(file.mimetype);
+
+        if (extname && mimetype) {
+            return cb(null, true);
+        } else {
+            cb(
+                new Error(
+                    "Arquivo inválido. Somente PDF, DOCX, DOC e TXT são permitidos."
+                )
+            );
+        }
+    },
+});
 
 //Rotas para Usuários
 router.get("/users", userController.getAll);
@@ -28,16 +69,32 @@ router.delete("/userdata/:userId/:curriculumId", userController.deleteUserData);
 // Rotas para Empresas
 router.get("/companies", companyController.getAll);
 router.get("/companies/:id", companyController.getCompanyById);
-router.post("/companies", companyController.createCompany);
-router.put("/companies/:id", companyController.updateCompany);
+router.post(
+    "/companies",
+    uploads.single("logo"),
+    companyController.createCompany
+);
+router.put(
+    "/companies/:id",
+    uploads.single("logo"),
+    companyController.updateCompany
+);
 router.delete("/companies/:id", companyController.deleteCompany);
 router.delete("/company/:id", companyController.deleteCompanyData);
 
 // Rotas para curriculum pg1 + dados escolares + pg4
 router.get("/curriculum", curriculumController.getAll);
 router.get("/curriculum/:id", curriculumController.getCurriculumById);
-router.post("/curriculum", curriculumController.createCurriculum);
-router.put("/curriculum/:id", curriculumController.updateCurriculum);
+router.post(
+    "/curriculum",
+    upload.single("attached"),
+    curriculumController.createCurriculum
+);
+router.put(
+    "/curriculum/:id",
+    upload.single("attached"),
+    curriculumController.updateCurriculum
+);
 router.delete("/curriculum/:id", curriculumController.deleteCurriculum);
 router.put("/curriculum/:id/addData", curriculumController.addDataToCurriculum);
 router.put("/curriculum/:id/addSchoolData", curriculumController.addSchoolData);

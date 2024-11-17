@@ -23,27 +23,39 @@ const getCompanyById = async (req, res) => {
 
 const createCompany = async (req, res) => {
     try {
-        const newCompany = await companyModel.createCompany(req.body);
+        const companyData = { ...req.body };
+
+        if (req.file) {
+            companyData.logo = req.file.filename;
+        }
+        const newCompany = await companyModel.createCompany(companyData);
+
         return res.status(201).json(newCompany);
     } catch (error) {
+        console.error("Erro no controller ao criar empresa:", error.message);
         return res.status(500).json({ error: "Erro ao criar empresa." });
     }
 };
 
 const updateCompany = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updatedData = req.body;
-        const updatedCompany = await companyModel.updateCompany(
-            id,
-            updatedData
-        );
-        if (!updatedCompany) {
-            return res.status(404).json({ error: "Empresa não encontrado." });
+        const companyData = { ...req.body };
+        if (req.file) {
+            companyData.logo = req.file.filename;
         }
+        const updatedCompany = await companyModel.updateCompany(
+            req.params.id,
+            companyData
+        );
+
+        if (!updatedCompany) {
+            return res.status(404).json({ error: "Empresa não encontrada." });
+        }
+
         return res.status(200).json(updatedCompany);
     } catch (error) {
-        return res.status(500).json({ error: "Erro ao atualizar a empresa." });
+        console.error("Erro ao atualizar empresa:", error.message);
+        return res.status(500).json({ error: "Erro ao atualizar empresa." });
     }
 };
 

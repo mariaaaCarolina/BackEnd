@@ -9,6 +9,8 @@ const getAll = async () => {
 const createCompany = async (company) => {
     const conn = await connect();
     try {
+        const normalizedCompany = { ...company };
+
         const {
             name,
             cnpj,
@@ -24,7 +26,7 @@ const createCompany = async (company) => {
             password,
             url,
             logo,
-        } = company;
+        } = normalizedCompany;
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
@@ -46,10 +48,11 @@ const createCompany = async (company) => {
                 logo,
             ]
         );
-        return { id: result.insertId, ...company };
+
+        return { id: result.insertId, ...normalizedCompany };
     } catch (error) {
         console.error("Erro ao criar a empresa:", error.message);
-        throw new Error("Erro ao criar a empresa");
+        throw new Error("Erro ao criar a empresa.");
     }
 };
 
@@ -58,13 +61,14 @@ const getById = async (id) => {
     const query = await conn.query("SELECT * FROM companies WHERE id = ?", [
         id,
     ]);
-    return query[0][0]; // Retorna um único usuário
+    return query[0][0];
 };
 
 const updateCompany = async (id, company) => {
-    let conn;
+    const conn = await connect();
     try {
-        conn = await connect();
+        const normalizedCompany = { ...company };
+
         const {
             name,
             cnpj,
@@ -80,13 +84,12 @@ const updateCompany = async (id, company) => {
             password,
             url,
             logo,
-        } = company;
+        } = normalizedCompany;
 
         const query = `
             UPDATE companies
             SET name = ?, cnpj = ?, segment = ?, responsible = ?, email = ?, phoneNumber = ?, city = ?, cep = ?, address = ?, addressNumber = ?, uf = ?, password = ?, url = ?, logo = ?
-            WHERE id = ?
-        `;
+            WHERE id = ?`;
 
         const [result] = await conn.query(query, [
             name,
@@ -106,12 +109,10 @@ const updateCompany = async (id, company) => {
             id,
         ]);
 
-        console.log("Query result:", result);
-
-        return result.affectedRows ? { id, ...company } : null;
-    } catch (err) {
-        console.error("Error during database query:", err);
-        throw new Error("Database query execution failed");
+        return result.affectedRows ? { id, ...normalizedCompany } : null;
+    } catch (error) {
+        console.error("Erro ao atualizar a empresa:", error.message);
+        throw new Error("Erro ao atualizar a empresa");
     }
 };
 
