@@ -1,6 +1,4 @@
-// const { query } = require("express");
-// const multer = require("multer");
-// const path = require("path");
+const { query } = require("express");
 const connect = require("../connection");
 
 const getAll = async () => {
@@ -31,28 +29,17 @@ const createCurriculum = async (curriculum) => {
             addressNumber,
             cep,
             uf,
+            attached,
             description,
+
             userId,
         } = curriculum;
 
-        const attached = curriculum.attached ? curriculum.attached : null;
-
-        const [userCheck] = await conn.query(
-            "SELECT id FROM users WHERE id = ?",
-            [userId]
-        );
-
-        if (userCheck.length === 0) {
-            throw new Error(
-                `O userId ${userId} não existe. Verifique o ID do usuário.`
-            );
-        }
-
         const [result] = await conn.query(
             `INSERT INTO curriculum (id, dateOfBirth, age, gender, race, city, 
-                attached, description,  
-                address, addressNumber, cep, uf, userId) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            attached, description,  
+            address, addressNumber, cep, uf, userId) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 id,
                 dateOfBirth,
@@ -66,7 +53,7 @@ const createCurriculum = async (curriculum) => {
                 addressNumber,
                 cep,
                 uf,
-                userId,
+                userId, // userId para associar o currículo ao usuário
             ]
         );
 
@@ -93,28 +80,13 @@ const updateCurriculum = async (id, updatedCurriculum) => {
             uf,
             attached,
             description,
-            schoolName,
-            schoolYear,
-            schoolCity,
-            schoolStartDate,
-            schoolEndDate,
-            isCurrentlyStudying,
-            userId,
         } = updatedCurriculum;
-
-        let updatedAttached = attached;
-
-        if (!attached) {
-            const existingCurriculum = await getById(id);
-            updatedAttached = existingCurriculum.attached;
-        }
 
         const [result] = await conn.query(
             `UPDATE curriculum 
-             SET dateOfBirth = ?, age = ?, gender = ?, race = ?, city = ?, address = ?, addressNumber = ?, 
-             cep = ?, uf = ?, attached = ?, description = ?, schoolName = ?, schoolYear = ?, 
-             schoolCity = ?, schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ?, userId = ? 
-             WHERE id = ?`,
+            SET dateOfBirth = ?, age = ?, gender = ?, race = ?, city = ?, address = ?, addressNumber = ?, 
+            cep = ?, uf = ?, attached = ?, description = ? 
+            WHERE id = ?`,
             [
                 dateOfBirth,
                 age,
@@ -125,15 +97,8 @@ const updateCurriculum = async (id, updatedCurriculum) => {
                 addressNumber,
                 cep,
                 uf,
-                updatedAttached,
+                attached,
                 description,
-                schoolName,
-                schoolYear,
-                schoolCity,
-                schoolStartDate,
-                schoolEndDate,
-                isCurrentlyStudying,
-                userId,
                 id,
             ]
         );

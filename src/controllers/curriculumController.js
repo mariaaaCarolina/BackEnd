@@ -23,36 +23,16 @@ const getCurriculumById = async (req, res) => {
 
 const createCurriculum = async (req, res) => {
     try {
-        if (!req.body) {
-            return res
-                .status(400)
-                .json({ error: "O corpo da requisição está vazio." });
-        }
-
-        if (!req.file) {
-            return res.status(400).json({ error: "Arquivo não enviado." });
-        }
-
-        const curriculumData = {
-            ...req.body,
-            attached: req.file.filename,
-        };
-
-        const result = await curriculumModel.createCurriculum(curriculumData);
-        return res.status(201).json(result);
+        const newCurriculum = await curriculumModel.createCurriculum(req.body);
+        return res.status(201).json(newCurriculum);
     } catch (error) {
-        console.error("Erro ao criar o currículo:", error.message);
-        res.status(500).json({ error: "Erro ao criar o currículo." });
+        return res.status(500).json({ error: "Erro ao criar curriculo." });
     }
 };
 
 const updateCurriculum = async (req, res) => {
     const { id } = req.params;
     const updatedData = req.body;
-
-    if (req.file) {
-        updatedData.attached = req.file.filename;
-    }
 
     try {
         const response = await curriculumModel.updateCurriculum(
@@ -61,7 +41,6 @@ const updateCurriculum = async (req, res) => {
         );
         return res.status(200).json(response);
     } catch (error) {
-        console.error("Erro ao atualizar o currículo:", error.message);
         return res
             .status(500)
             .json({ error: "Erro ao atualizar o currículo." });
