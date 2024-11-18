@@ -8,55 +8,13 @@ const academicDataController = require("./controllers/academicDataController");
 const competencesController = require("./controllers/competencesController");
 const vacancyController = require("./controllers/vacancyController");
 const questionsController = require("./controllers/questionsController");
+// const { route } = require("./app");
 const applicationController = require("./controllers/applicationController");
 const answersController = require("./controllers/answersController");
 const messagesController = require("./controllers/messagesController");
+
 const router = express.Router();
-const multer = require("multer");
-const path = require("path");
 require("dotenv").config();
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, "../public/images/"));
-    },
-    filename: (req, file, cb) => {
-        const safeName = file.originalname.replace(/\s/g, "_");
-        cb(null, Date.now() + "-" + safeName);
-    },
-});
-const uploads = multer({ storage });
-
-const storage2 = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "public/attachments/");
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    },
-});
-
-const upload = multer({
-    storage: storage2,
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = /pdf|docx|doc|txt/;
-        const extname = allowedTypes.test(
-            path.extname(file.originalname).toLowerCase()
-        );
-        const mimetype = allowedTypes.test(file.mimetype);
-
-        if (extname && mimetype) {
-            return cb(null, true);
-        } else {
-            cb(
-                new Error(
-                    "Arquivo inválido. Somente PDF, DOCX, DOC e TXT são permitidos."
-                )
-            );
-        }
-    },
-});
 
 //Rotas para Usuários
 router.get("/users", userController.getAll);
@@ -70,32 +28,16 @@ router.delete("/userdata/:userId/:curriculumId", userController.deleteUserData);
 // Rotas para Empresas
 router.get("/companies", companyController.getAll);
 router.get("/companies/:id", companyController.getCompanyById);
-router.post(
-    "/companies",
-    uploads.single("logo"),
-    companyController.createCompany
-);
-router.put(
-    "/companies/:id",
-    uploads.single("logo"),
-    companyController.updateCompany
-);
+router.post("/companies", companyController.createCompany);
+router.put("/companies/:id", companyController.updateCompany);
 router.delete("/companies/:id", companyController.deleteCompany);
 router.delete("/company/:id", companyController.deleteCompanyData);
 
 // Rotas para curriculum pg1 + dados escolares + pg4
 router.get("/curriculum", curriculumController.getAll);
 router.get("/curriculum/:id", curriculumController.getCurriculumById);
-router.post(
-    "/curriculum",
-    upload.single("attached"),
-    curriculumController.createCurriculum
-);
-router.put(
-    "/curriculum/:id",
-    upload.single("attached"),
-    curriculumController.updateCurriculum
-);
+router.post("/curriculum", curriculumController.createCurriculum);
+router.put("/curriculum/:id", curriculumController.updateCurriculum);
 router.delete("/curriculum/:id", curriculumController.deleteCurriculum);
 router.put("/curriculum/:id/addData", curriculumController.addDataToCurriculum);
 router.put("/curriculum/:id/addSchoolData", curriculumController.addSchoolData);
@@ -127,8 +69,6 @@ router.get("/vacancies/:id", vacancyController.getVacanciesById);
 router.post("/vacancy", vacancyController.createVacancy);
 router.put("/vacancy/:id", vacancyController.updateVacancy);
 router.delete("/vacancy/:id", vacancyController.deleteVacancy);
-router.put("/vacancyIsActive/:id", vacancyController.updateIsActive);
-router.put("/vacancyIsFilled/:id", vacancyController.updateIsFilled);
 
 // Rotas para Perguntas da vaga
 router.get("/vacancy/questions", questionsController.getAll);
@@ -146,7 +86,7 @@ router.get("/applications", applicationController.getAll);
 router.get("/applications/:id", applicationController.getApplicationById);
 router.post("/application", applicationController.createApplication);
 router.put("/application", applicationController.updateApplication);
-router.delete("/application/:id", applicationController.deleteApplication);
+router.delete("/application", applicationController.deleteApplication);
 router.get(
     "/applications/vacancy/:vacancyId",
     applicationController.getApplicationsByVacancyId
