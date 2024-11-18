@@ -2,47 +2,77 @@ const companyModel = require("../models/companyModel");
 
 const getAll = async (req, res) => {
     try {
-        const companies = await companyModel.getAll();
-        return res.status(200).json(companies);
+        const companies = await companyModel.getAll(); // Recupera todas as empresas do banco
+
+        // Atualiza o campo logo para cada empresa
+        const updatedCompanies = companies.map((company) => {
+            return {
+                ...company,
+                logo: `${req.protocol}://${req.get("host")}${company.logo}`,
+            };
+        });
+
+        return res.status(200).json(updatedCompanies); // Retorna as empresas com os logos atualizados
     } catch (error) {
+        console.error("Erro ao buscar empresas:", error);
         return res.status(500).json({ error: "Erro ao buscar empresas." });
     }
 };
 
 const getCompanyById = async (req, res) => {
     try {
-        const company = await companyModel.getById(req.params.id);
+        const { id } = req.params;
+        const company = await companyModel.getById(id); // Recupera a empresa do banco
+
         if (!company) {
-            return res.status(404).json({ error: "Empresa não encontrado." });
+            return res.status(404).json({ error: "Empresa não encontrada." });
         }
-        return res.status(200).json(company);
+        company.logo = `${req.protocol}://${req.get("host")}${company.logo}`;
+
+        return res.status(200).json(company); // Retorna a empresa com o logo atualizado
     } catch (error) {
+        console.error("Erro ao buscar empresa:", error);
         return res.status(500).json({ error: "Erro ao buscar empresa." });
     }
 };
 
 const createCompany = async (req, res) => {
     try {
-        const newCompany = await companyModel.createCompany(req.body);
+        const companyData = req.body;
+
+        // Se um arquivo foi enviado, salve o caminho no banco
+        if (req.file) {
+            companyData.logo = `/uploads/images/${req.file.filename}`;
+        }
+
+        const newCompany = await companyModel.createCompany(companyData);
         return res.status(201).json(newCompany);
     } catch (error) {
-        return res.status(500).json({ error: "Erro ao criar empresa." });
+        console.error("Erro ao criar a empresa:", error);
+        return res.status(500).json({ error: "Erro ao criar a empresa." });
     }
 };
 
 const updateCompany = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedData = req.body;
+        const companyData = req.body;
+
+        // Se um arquivo foi enviado, atualize o caminho no banco
+        if (req.file) {
+            companyData.logo = `/uploads/images/${req.file.filename}`;
+        }
+
         const updatedCompany = await companyModel.updateCompany(
             id,
-            updatedData
+            companyData
         );
         if (!updatedCompany) {
-            return res.status(404).json({ error: "Empresa não encontrado." });
+            return res.status(404).json({ error: "Empresa não encontrada." });
         }
         return res.status(200).json(updatedCompany);
     } catch (error) {
+        console.error("Erro ao atualizar a empresa:", error);
         return res.status(500).json({ error: "Erro ao atualizar a empresa." });
     }
 };
