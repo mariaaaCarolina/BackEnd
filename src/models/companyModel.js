@@ -30,7 +30,7 @@ const createCompany = async (company, logoFilename) => {
         const logoUrl = `${
             process.env.BASE_URL ||
             "https://backend-production-ff1f.up.railway.app"
-        }/images/${logoFilename}`;
+        }/images/${encodeURIComponent(logoFilename)}`;
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
