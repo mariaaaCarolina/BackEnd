@@ -52,6 +52,7 @@ const createCompany = async (company, logoFilename) => {
                 logoUrl,
             ]
         );
+        console.log("Logo salva em:", logoFilename);
 
         return { id: result.insertId, ...normalizedCompany, logo: logoUrl };
     } catch (error) {
