@@ -147,6 +147,10 @@ router.get("/applications/:id", applicationController.getApplicationById);
 router.post("/application", applicationController.createApplication);
 router.put("/application", applicationController.updateApplication);
 router.delete("/application/:id", applicationController.deleteApplication);
+router.get(
+    "/applications/vacancy/:vacancyId",
+    applicationController.getApplicationsByVacancyId
+);
 
 //Rotas para respostas das perguntas da vaga
 router.get("/answers", answersController.getAll);

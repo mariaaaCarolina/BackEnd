@@ -23,6 +23,17 @@ const getApplicationById = async (req, res) => {
     }
 };
 
+const getApplicationsByVacancyId = async (req, res) => {
+    const { vacancyId } = req.params;
+    try {
+        const applications = await applicationModel.getByVacancyId(vacancyId);
+        return res.status(200).json(applications);
+    } catch (error) {
+        console.error("Erro ao buscar candidaturas por vaga:", error.message);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
 const createApplication = async (req, res) => {
     try {
         const newApplication = await applicationModel.createApplication(
@@ -74,6 +85,7 @@ const deleteApplication = async (req, res) => {
 module.exports = {
     getAll,
     createApplication,
+    getApplicationsByVacancyId,
     getApplicationById,
     updateApplication,
     deleteApplication,

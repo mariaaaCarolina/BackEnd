@@ -15,6 +15,20 @@ const getById = async (id) => {
     return query[0];
 };
 
+const getByVacancyId = async (vacancyId) => {
+    const conn = await connect();
+    try {
+        const query = await conn.query(
+            "SELECT * FROM application WHERE vacancyId = ?",
+            [vacancyId]
+        );
+        return query[0];
+    } catch (error) {
+        console.error("Erro ao buscar candidaturas pela vaga:", error.message);
+        throw new Error("Erro ao buscar candidaturas pela vaga.");
+    }
+};
+
 const checkExistence = async (table, id) => {
     const conn = await connect();
     try {
@@ -85,6 +99,7 @@ module.exports = {
     getAll,
     createApplication,
     getById,
+    getByVacancyId,
     updateApplication,
     deleteApplication,
 };
