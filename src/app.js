@@ -8,6 +8,5 @@ swagger(app);
 app.use(express.json());
 app.use(cors());
 app.use(router);
-app.use("/uploads/images", express.static("uploads"));
 
 module.exports = app;

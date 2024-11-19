@@ -11,9 +11,6 @@ const questionsController = require("./controllers/questionsController");
 const applicationController = require("./controllers/applicationController");
 const answersController = require("./controllers/answersController");
 const messagesController = require("./controllers/messagesController");
-// const multer = require("multer");
-// const path = require("path");
-const uploadImage = require("./uploadImage");
 const router = express.Router();
 require("dotenv").config();
 
@@ -29,16 +26,8 @@ router.delete("/userdata/:userId/:curriculumId", userController.deleteUserData);
 // Rotas para Empresas
 router.get("/companies", companyController.getAll);
 router.get("/companies/:id", companyController.getCompanyById);
-router.post(
-    "/companies",
-    uploadImage.single("logo"),
-    companyController.createCompany
-);
-router.put(
-    "/companies/:id",
-    uploadImage.single("logo"),
-    companyController.updateCompany
-);
+router.post("/companies", companyController.createCompany);
+router.put("/companies/:id", companyController.updateCompany);
 router.delete("/companies/:id", companyController.deleteCompany);
 router.delete("/company/:id", companyController.deleteCompanyData);
 
