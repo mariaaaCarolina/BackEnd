@@ -85,13 +85,13 @@ const updateApplication = async (id, application) => {
     return result.affectedRows ? { id, ...application } : null;
 };
 
-const deleteApplication = async (id) => {
+const deleteApplication = async (userId, vacancyId) => {
     const conn = await connect();
     const query = `
         DELETE FROM application 
-        WHERE id = ?
+        WHERE userId = ? AND vacancyId = ?
     `;
-    const [result] = await conn.query(query, [id]);
+    const [result] = await conn.query(query, [userId, vacancyId]);
     return result;
 };
 

@@ -68,16 +68,26 @@ const updateApplication = async (req, res) => {
 
 const deleteApplication = async (req, res) => {
     try {
-        const { id } = req.params;
-        const result = await applicationModel.deleteApplication(id);
+        const { userId, vacancyId } = req.params;
+        if (!userId || !vacancyId) {
+            return res.status(400).json({
+                error: "Os parâmetros userId e vacancyId são obrigatórios.",
+            });
+        }
+
+        const result = await applicationModel.deleteApplication(
+            userId,
+            vacancyId
+        );
         if (result.affectedRows === 0) {
             return res
                 .status(404)
-                .json({ error: "Candidatura não encontrado." });
+                .json({ error: "Candidatura não encontrada." });
         }
 
         return res.status(204).send();
     } catch (error) {
+        console.error(error);
         return res.status(500).json({ error: "Erro ao excluir candidatura." });
     }
 };
