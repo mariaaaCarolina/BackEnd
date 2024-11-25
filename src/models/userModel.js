@@ -91,6 +91,7 @@ const deleteUser = async (id) => {
     const conn = await connect();
     try {
         await conn.query("DELETE FROM messages WHERE sender_id = ?", [id]);
+        await conn.query("DELETE FROM answers WHERE userId = ?", [id]);
         const [result] = await conn.query("DELETE FROM users WHERE id = ?", [
             id,
         ]);

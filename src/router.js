@@ -85,7 +85,7 @@ router.get(
 router.get("/applications", applicationController.getAll);
 router.get("/applications/:id", applicationController.getApplicationById);
 router.post("/application", applicationController.createApplication);
-router.put("/application", applicationController.updateApplication);
+router.put("/application/:id", applicationController.updateApplication);
 router.delete(
     "/application/:userId/:vacancyId",
     applicationController.deleteApplication
