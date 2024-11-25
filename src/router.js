@@ -67,6 +67,8 @@ router.get("/vacancies/:id", vacancyController.getVacanciesById);
 router.post("/vacancy", vacancyController.createVacancy);
 router.put("/vacancy/:id", vacancyController.updateVacancy);
 router.delete("/vacancy/:id", vacancyController.deleteVacancy);
+router.put("/vacancyIsActive/:id", vacancyController.updateIsActive);
+router.put("/vacancyIsFilled/:id", vacancyController.updateIsFilled);
 
 // Rotas para Perguntas da vaga
 router.get("/vacancy/questions", questionsController.getAll);
