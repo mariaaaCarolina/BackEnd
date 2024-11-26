@@ -69,6 +69,7 @@ const updateApplication = async (req, res) => {
 const deleteApplication = async (req, res) => {
     try {
         const { userId, vacancyId } = req.params;
+
         if (!userId || !vacancyId) {
             return res.status(400).json({
                 error: "Os parâmetros userId e vacancyId são obrigatórios.",
@@ -79,6 +80,7 @@ const deleteApplication = async (req, res) => {
             userId,
             vacancyId
         );
+
         if (result.affectedRows === 0) {
             return res
                 .status(404)

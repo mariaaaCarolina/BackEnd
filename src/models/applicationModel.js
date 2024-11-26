@@ -87,12 +87,38 @@ const updateApplication = async (id, application) => {
 
 const deleteApplication = async (userId, vacancyId) => {
     const conn = await connect();
-    const query = `
-        DELETE FROM application 
-        WHERE userId = ? AND vacancyId = ?
-    `;
-    const [result] = await conn.query(query, [userId, vacancyId]);
-    return result;
+
+    try {
+        await conn.beginTransaction();
+
+        // excluir as respostas associadas
+        const deleteResponsesQuery = `
+            DELETE FROM answers
+            WHERE applicationId IN (
+                SELECT id FROM application 
+                WHERE userId = ? AND vacancyId = ?
+            )
+        `;
+        await conn.query(deleteResponsesQuery, [userId, vacancyId]);
+
+        const deleteApplicationQuery = `
+            DELETE FROM application
+            WHERE userId = ? AND vacancyId = ?
+        `;
+        const [result] = await conn.query(deleteApplicationQuery, [
+            userId,
+            vacancyId,
+        ]);
+
+        await conn.commit();
+
+        return result;
+    } catch (error) {
+        await conn.rollback();
+        throw error;
+    } finally {
+        conn.end();
+    }
 };
 
 module.exports = {
