@@ -11,6 +11,7 @@ const questionsController = require("./controllers/questionsController");
 const applicationController = require("./controllers/applicationController");
 const answersController = require("./controllers/answersController");
 const messagesController = require("./controllers/messagesController");
+const cancelledApplicationController = require("./controllers/cancelledApplicationController");
 const router = express.Router();
 require("dotenv").config();
 
@@ -112,5 +113,24 @@ router.get("/message/:id", messagesController.getById);
 router.post("/message", messagesController.createMessage);
 router.put("/message/:id", messagesController.updateMessage);
 router.delete("/message/:id", messagesController.deleteMessage);
+
+//Rotas para candidaturas canceladas
+router.get("/cancelledApplications", cancelledApplicationController.getAll);
+router.get(
+    "/cancelledApplication/:userId",
+    cancelledApplicationController.getCancelledApplicationById
+);
+router.post(
+    "/cancelledApplication",
+    cancelledApplicationController.createCancelledApplication
+);
+router.put(
+    "/cancelledApplication/:id",
+    cancelledApplicationController.updateCancelledApplication
+);
+router.delete(
+    "/cancelledApplication/:userId/:vacancyId",
+    cancelledApplicationController.deleteCancelledApplication
+);
 
 module.exports = router;

@@ -35,21 +35,28 @@ const getCompanyById = async (req, res) => {
         return res.status(500).json({ error: "Erro ao buscar empresa." });
     }
 };
-
 const createCompany = async (req, res) => {
     try {
-        const companyData = req.body;
+        console.log("Arquivo recebido:", req.file);
+        console.log("Dados recebidos:", req.body); // Verifique se os dados do corpo também estão presentes
 
-        // Se um arquivo foi enviado, salve o caminho no banco
-        if (req.file) {
-            companyData.logo = `/uploads/images/${req.file.filename}`;
+        if (!req.file) {
+            return res
+                .status(400)
+                .json({ error: "Arquivo de logo não enviado." });
         }
 
-        const newCompany = await companyModel.createCompany(companyData);
-        return res.status(201).json(newCompany);
+        const companyData = req.body;
+        const logoFilename = req.file.filename;
+
+        const newCompany = await companyModel.createCompany(
+            companyData,
+            logoFilename
+        );
+        res.status(201).json(newCompany);
     } catch (error) {
-        console.error("Erro ao criar a empresa:", error);
-        return res.status(500).json({ error: "Erro ao criar a empresa." });
+        console.error("Erro no controlador ao criar a empresa:", error.message);
+        res.status(500).json({ error: "Erro ao criar a empresa." });
     }
 };
 
@@ -58,9 +65,8 @@ const updateCompany = async (req, res) => {
         const { id } = req.params;
         const companyData = req.body;
 
-        // Se um arquivo foi enviado, atualize o caminho no banco
         if (req.file) {
-            companyData.logo = `/uploads/images/${req.file.filename}`;
+            companyData.logo = `/public/images/${req.file.filename}`;
         }
 
         const updatedCompany = await companyModel.updateCompany(
@@ -82,7 +88,7 @@ const deleteCompany = async (req, res) => {
         const { id } = req.params;
         const result = await companyModel.deleteCompany(id);
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Empresa não encontrado." });
+            return res.status(404).json({ error: "Empresa não encontrada." });
         }
 
         return res.status(204).send();
