@@ -17,16 +17,16 @@ const getAll = async (req, res) => {
 
 const getCancelledApplicationById = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { userId } = req.params;
 
-        if (!id) {
+        if (!userId) {
             return res
                 .status(400)
                 .json({ error: "O parâmetro id é obrigatório." });
         }
 
         const cancelledApplication = await cancelledApplicationModel.getById(
-            id
+            userId
         );
 
         if (!cancelledApplication) {
