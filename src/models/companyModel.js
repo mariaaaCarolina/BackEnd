@@ -6,11 +6,9 @@ const getAll = async () => {
     return query[0];
 };
 
-const createCompany = async (company, logoFilename) => {
+const createCompany = async (company) => {
     const conn = await connect();
     try {
-        const normalizedCompany = { ...company };
-
         const {
             name,
             cnpj,
@@ -25,12 +23,8 @@ const createCompany = async (company, logoFilename) => {
             uf,
             password,
             url,
-        } = normalizedCompany;
-
-        const logoUrl = `${
-            process.env.BASE_URL ||
-            "https://backend-production-ff1f.up.railway.app"
-        }/images/${encodeURIComponent(logoFilename)}`;
+            logo,
+        } = company;
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
@@ -49,14 +43,13 @@ const createCompany = async (company, logoFilename) => {
                 uf,
                 password,
                 url,
-                logoUrl,
+                logo,
             ]
         );
-        console.log("Logo salva em:", logoFilename);
-        return { id: result.insertId, ...normalizedCompany, logo: logoUrl };
+        return { id: result.insertId, ...company };
     } catch (error) {
         console.error("Erro ao criar a empresa:", error.message);
-        throw new Error("Erro ao criar a empresa.");
+        throw new Error("Erro ao criar a empresa");
     }
 };
 
