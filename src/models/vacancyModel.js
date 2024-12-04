@@ -161,18 +161,32 @@ const updateIsFilled = async (id, isFilled) => {
 const deleteVacancy = async (id) => {
     const conn = await connect();
     try {
+        await conn.beginTransaction();
+        await conn.query(
+            `DELETE FROM answers WHERE questionId IN (SELECT id FROM questions WHERE vacancyId = ?);`,
+            [id]
+        );
+
+        await conn.query(`DELETE FROM questions WHERE vacancyId = ?;`, [id]);
+
         const [result] = await conn.query(`DELETE FROM vacancy WHERE id = ?;`, [
             id,
         ]);
 
         if (result.affectedRows === 0) {
-            throw new Error("Vaga nao encontrada.");
+            throw new Error("Vaga não encontrada.");
         }
 
-        return { message: "Vaga deletada com sucesso." };
+        await conn.commit();
+
+        return {
+            message:
+                "Vaga e seus dados relacionados foram deletados com sucesso.",
+        };
     } catch (error) {
+        await conn.rollback();
         console.error("Erro ao deletar vaga:", error.message);
-        throw new Error("Erro ao deletar a vaga.");
+        throw new Error("Erro ao deletar a vaga e seus dados relacionados.");
     }
 };
 
