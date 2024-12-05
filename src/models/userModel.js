@@ -29,14 +29,6 @@ const getById = async (id) => {
     return query[0][0]; // Retorna um único usuário
 };
 
-// const getUserByEmail = async (email) => {
-//     const conn = await connect();
-//     const [rows] = await conn.query("SELECT * FROM users WHERE email = ?", [
-//         email,
-//     ]);
-//     return rows[0];
-// };
-
 const createUser = async (user) => {
     const conn = await connect();
     try {

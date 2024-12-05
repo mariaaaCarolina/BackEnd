@@ -11,11 +11,14 @@ const swaggerOptions = {
         },
         servers: [
             {
+                url: "https://backend-production-ff1f.up.railway.app",
+            },
+            {
                 url: "http://localhost:3333",
             },
         ],
     },
-    apis: ["./routes/router.js"],
+    apis: ["./src/router.js"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
