@@ -12,6 +12,7 @@ const applicationController = require("./controllers/applicationController");
 const answersController = require("./controllers/answersController");
 const messagesController = require("./controllers/messagesController");
 const cancelledApplicationController = require("./controllers/cancelledApplicationController");
+const forgotPasswordController = require("./controllers/forgotPassword");
 const router = express.Router();
 require("dotenv").config();
 
@@ -3192,5 +3193,8 @@ router.delete(
     "/cancelledApplication/:userId/:vacancyId",
     cancelledApplicationController.deleteCancelledApplication
 );
+
+router.post("/forgotPassword", forgotPasswordController.forgotPassword);
+router.post("/resetPassword", forgotPasswordController.resetPassword);
 
 module.exports = router;

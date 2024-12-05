@@ -52,7 +52,13 @@ const deleteQuestion = async (req, res) => {
         const response = await questionsModel.deleteQuestion(id);
         return res.status(200).json(response);
     } catch (error) {
-        return res.status(500).json({ error: "Erro ao deletar a pergunta." });
+        console.error(
+            "Erro no controlador ao deletar pergunta:",
+            error.message
+        );
+        return res
+            .status(500)
+            .json({ error: "Erro ao deletar a pergunta e suas respostas." });
     }
 };
 

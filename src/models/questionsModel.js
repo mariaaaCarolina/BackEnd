@@ -59,18 +59,30 @@ const updateQuestion = async (id, questions) => {
 const deleteQuestion = async (id) => {
     const conn = await connect();
     try {
+        await conn.beginTransaction();
+
+        await conn.query(`DELETE FROM answers WHERE questionId = ?;`, [id]);
+
         const [result] = await conn.query(
             `DELETE FROM questions WHERE id = ?;`,
             [id]
         );
-        if (result.affectedRows === 0) {
-            throw new Error(`Pergunta com ID ${id} não encontrado.`);
-        }
 
-        return { message: `Pergunta com ID ${id} deletado com sucesso.` };
+        if (result.affectedRows === 0) {
+            throw new Error(`Pergunta com ID ${id} não encontrada.`);
+        }
+        await conn.commit();
+
+        return {
+            message: `Pergunta com ID ${id} deletada com sucesso, incluindo suas respostas.`,
+        };
     } catch (error) {
-        console.error("Erro ao deletar dados da pergunta:", error.message);
-        throw new Error("Erro ao deletar dados da pergunta.");
+        await conn.rollback();
+        console.error(
+            "Erro ao deletar pergunta e respostas associadas:",
+            error.message
+        );
+        throw new Error("Erro ao deletar a pergunta e respostas associadas.");
     }
 };
 
