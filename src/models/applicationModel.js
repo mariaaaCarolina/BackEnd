@@ -91,12 +91,10 @@ const deleteApplication = async (userId, vacancyId) => {
     try {
         await conn.beginTransaction();
 
-        // excluir as respostas associadas
         const deleteResponsesQuery = `
             DELETE FROM answers
-            WHERE applicationId IN (
-                SELECT id FROM application 
-                WHERE userId = ? AND vacancyId = ?
+            WHERE userId = ? AND questionId IN (
+                SELECT id FROM questions WHERE vacancyId = ?
             )
         `;
         await conn.query(deleteResponsesQuery, [userId, vacancyId]);
@@ -111,13 +109,10 @@ const deleteApplication = async (userId, vacancyId) => {
         ]);
 
         await conn.commit();
-
         return result;
     } catch (error) {
         await conn.rollback();
         throw error;
-    } finally {
-        conn.end();
     }
 };
 
