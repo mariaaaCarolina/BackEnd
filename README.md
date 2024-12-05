@@ -1,14 +1,16 @@
 # Primeira Oportunidade API
 
-API para gerenciamento de usuários, currículos e mensagens, projetada para o site **Primeira Oportunidade**. Esta API fornece funcionalidades como CRUD de usuários, associações de currículos e exclusão de dados relacionados.
+API para gerenciamento de usuários, currículos, empresas, vagas e candidaturas, projetada para o site **Primeira Oportunidade**. Esta API fornece funcionalidades como CRUD de usuários e empresa, associações de currículos e vagas e exclusão de dados relacionados.
 
 ## Índice
 
 -   [Sobre](#sobre)
 -   [Tecnologias Utilizadas](#tecnologias-utilizadas)
+-   [Dependências Utilizadas](#dependências-utilizadas)
 -   [Instalação](#instalação)
 -   [Uso](#uso)
 -   [Estrutura do Projeto](#estrutura-do-projeto)
+-   [Desenvolvedores](#desenvolvedores)
 
 ## Sobre
 
@@ -20,6 +22,21 @@ Este projeto consiste em uma API que permite gerenciar informações de usuário
 -   **Express**: Framework web para Node.js.
 -   **MySQL**: Banco de dados relacional.
 -   **Swagger**: Documentação da API.
+
+## Dependências Utilizadas
+
+-   **Axios**: 1.7.7
+-   **Bcrypt**: 5.1.1
+-   **Body-parser**: 1.20.3
+-   **Cors**: 2.8.5
+-   **Dotenv**: 16.4.5
+-   **Express**: 4.21.0
+-   **Fs**: 0.0.1-security
+-   **Jsonwebtoken**: 9.0.2
+-   **Mysql2**: 3.11.3
+-   **Nodemon**: 3.1.7
+-   **Swagger-jsdoc**: 6.2.8
+-   **Swagger-ui-express**: 5.0.1
 
 ## Instalação
 
@@ -54,3 +71,8 @@ A documentação completa da API pode ser acessada em http://localhost:3333/api-
 ## **Estrutura do Projeto**:
 
 ![estrutura-do-projeto](./image_readme/estrutura.png)
+
+## Desenvolvedores
+
+-   Maria Carolina de Oliveira Barbosa
+-   Lucas Cavalcante Martins
