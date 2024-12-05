@@ -33,7 +33,8 @@ Siga os passos abaixo para rodar o projeto localmente.
 ### Passos para Instalação
 
 1. **Clone o repositório**:
-2. **Instale as dpendências**:
+    - https://github.com/mariaaaCarolina/BackEnd.git
+2. **Instale as dependências**:
     - npm install
 3. **Configure o banco de dados**:
     - crie e estruture o banco de dados
@@ -50,23 +51,6 @@ A API é um serviço RESTful que permite realizar operações de CRUD em usuári
 
 A documentação completa da API pode ser acessada em http://localhost:3333/api-docs.
 
-# **Estrutura do Projeto**:
+## **Estrutura do Projeto**:
 
-/BackEnd
-│
-├── /src
-│ ├── /controllers # Diretório para controladores
-│ ├── /models # Diretório para modelos de dados
-│ ├── app.js # Configuração principal do Express
-│ ├── auth.js # Lógica para autenticação e token (ainda não desenvolvido)
-│ ├── connection.js # Lógica da conexão com o banco de dados
-│ ├── DigiCertGlobalRootG2.crt # Certificado SSL/TLS do servidor do banco de dados
-│ ├── router.js # Definição das rota
-│ ├── server.js # Inicia o servidor
-│ ├── swagger.js # Configuração da documentação da API
-│
-├── .env # Arquivo de variáveis de ambiente
-├── .env.example # Exemplo do arquivo de variáveis de ambiente
-├── .gitignore # Arquivo para ignorar arquivos/pastas no controle de versão
-├── package-lock.json # Versões travadas das dependências
-├── package.json # Gerenciador de dependências
+![estrutura-do-projeto](./image_readme/estrutura.png)
