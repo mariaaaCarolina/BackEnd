@@ -1,0 +1,52 @@
+[33mf9f954b[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m excluidno pergunta junto com resposta
+[33mb0d65ab[m ultima atualização readme
+[33mc67bbf7[m atualizando o readme
+[33mda1495e[m updt readme
+[33m01786e6[m Update README.md
+[33m965dd1d[m Create README.md
+[33m84e870b[m ajuste na documentação
+[33m8fe211f[m adicionando documentação da API
+[33mb5417ea[m apagando resposta junto com a candidatura
+[33m124403b[m tirando a parte de logo do post de empresa
+[33maffc470[m excluir vaga
+[33m633f53e[m arrumando o getById do cancelled_applications
+[33m8c82645[m CRUD cancelamento de candidatura
+[33mecda8b3[m apagando respostas junto
+[33m4d0172d[m respostas
+[33md78ddb3[m rota isfilled e isactive
+[33m6d5f913[m delete application
+[33m802aa7f[m id do delete
+[33me87765f[m ok?
+[33m053fae3[m finge que não aconteceu nd dnv
+[33m9a169ff[m volta o cão arrependido
+[33m255a882[m tinha esquecido aqui
+[33m058e1a4[m desfazendo tudo
+[33m089035b[m rota de candidaturas por vaga
+[33m194909e[m dnv
+[33m37bf7de[m teste
+[33m86cc556[m testando
+[33mbb95640[m para testar a logo da empresa no post
+[33m16cb0fb[m roda de oração nesse commit
+[33m961a26e[m finge que as outras não existiram
+[33m455fbdc[m dnv
+[33mdf17228[m novamente
+[33m0fd2ae3[m testando a imagem
+[33md9a9425[m isFilled e IsActive
+[33m1e493f9[m ajuste na rota de application
+[33mf795c72[m add
+[33m230e2ab[m ajuste curriculo
+[33mb1473d5[m alterações no put e delete
+[33maaeec96[m teste3
+[33mf0c1a73[m chave
+[33m2fb7d22[m teste2
+[33mb3c1e2d[m teste para hospedagem
+[33m7d50f14[m crud de mensagem e resposta
+[33m8cf1552[m add crud de pergunta, e alterações em usuario e curriculo
+[33m11d1e6f[m getById do academicData ok e teste para o deploy
+[33md692583[m aparentemente tudo ok menos curriculumId de competencia e o getById de academicData
+[33mbd03e01[m crud de candidatura
+[33mb8f9652[m crud vaga ok e crud competencias meio (quase nada) ok
+[33m2311e3e[m curriculo pg2 pg3 crud
+[33m1bd07f3[m delete e put curriculo
+[33m8771a73[m get e post curriculo
+[33md1bf05d[m primeiro commit
