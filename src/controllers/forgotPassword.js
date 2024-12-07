@@ -10,7 +10,7 @@ const forgotPassword = (req, res) => {
         return res.status(400).send("E-mail é obrigatório!");
     }
 
-    const token = jwt.sign({ email }, "process.env.JWT_SECRET", {
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
         expiresIn: "1h",
     });
 
@@ -22,11 +22,10 @@ const forgotPassword = (req, res) => {
         subject: "Recuperação de Senha",
         text: `Aqui está o link para recuperar sua senha: ${resetLink}`,
         html: `<div style="font-family: Arial, sans-serif; background-color: #F4F7FA; padding: 30px; text-align: center;">
-        <div style="background-color: #003366; padding: 20px; color: white; border-radius: 8px;">
-            <img src="https:///primeira-oportunidade-frontend.vercel.app/image_readme/logo.png" alt="Logo" style="max-width: 100px;">
+        <div style="background-color: #004aad; padding: 20px; color: white; border-radius: 8px;">
             <h2 style="font-size: 24px; margin-top: 20px;">Recuperação de Senha</h2>
-            <p style="font-size: 18px; margin: 20px 0;">Aqui está o link para recuperar sua senha:</p>
-            <a href="${resetLink}" style="background-color: #FF6347; color: white; padding: 15px 30px; font-size: 18px; text-decoration: none; border-radius: 8px;">
+            <p style="font-size: 18px; margin: 20px 0;">Clique no botão para recuperar sua senha:</p>
+            <a href="${resetLink}" style="background-color: #ff7b2a; color: white; padding: 15px 30px; font-size: 18px; font-weight: bold; text-decoration: none; border-radius: 8px;">
                 Redefinir Senha
             </a>
             <p style="font-size: 14px; margin-top: 30px; color: #888;">Este link expira em 1 hora.</p>
