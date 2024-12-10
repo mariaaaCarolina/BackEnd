@@ -77,7 +77,7 @@ const createCurriculum = async (curriculum) => {
     }
 };
 
-const updateCurriculum = async (id, updatedCurriculum) => {
+const updateCurriculum = async (id, curriculum) => {
     const conn = await connect();
 
     try {
@@ -91,29 +91,13 @@ const updateCurriculum = async (id, updatedCurriculum) => {
             addressNumber,
             cep,
             uf,
-            attached,
-            description,
-            schoolName,
-            schoolYear,
-            schoolCity,
-            schoolStartDate,
-            schoolEndDate,
-            isCurrentlyStudying,
             userId,
-        } = updatedCurriculum;
-
-        let updatedAttached = attached;
-
-        if (!attached) {
-            const existingCurriculum = await getById(id);
-            updatedAttached = existingCurriculum.attached;
-        }
+        } = curriculum;
 
         const [result] = await conn.query(
             `UPDATE curriculum 
              SET dateOfBirth = ?, age = ?, gender = ?, race = ?, city = ?, address = ?, addressNumber = ?, 
-             cep = ?, uf = ?, attached = ?, description = ?, schoolName = ?, schoolYear = ?, 
-             schoolCity = ?, schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ?, userId = ? 
+             cep = ?, uf = ?, userId = ? 
              WHERE id = ?`,
             [
                 dateOfBirth,
@@ -125,14 +109,6 @@ const updateCurriculum = async (id, updatedCurriculum) => {
                 addressNumber,
                 cep,
                 uf,
-                updatedAttached,
-                description,
-                schoolName,
-                schoolYear,
-                schoolCity,
-                schoolStartDate,
-                schoolEndDate,
-                isCurrentlyStudying,
                 userId,
                 id,
             ]

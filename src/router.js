@@ -3193,8 +3193,73 @@ router.delete(
     "/cancelledApplication/:userId/:vacancyId",
     cancelledApplicationController.deleteCancelledApplication
 );
+/**
+ * @swagger
+ * tags:
+ *   - name: Redefinir Senha
+ *     description: Operações relacionadas à redefinição de senha
+ */
 
+/**
+ * @swagger
+ * /forgotPassword:
+ *   post:
+ *     tags: [Redefinir Senha]
+ *     summary: Enviar email para recuperação de senha
+ *     description: Envia um email com um link para redefinir a senha do usuário.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: O email do usuário para o qual o link de redefinição de senha será enviado.
+ *                 example: usuario@exemplo.com
+ *     responses:
+ *       200:
+ *         description: E-mail de recuperação enviado com sucesso.
+ *       400:
+ *         description: E-mail não fornecido ou inválido.
+ *       500:
+ *         description: Erro ao enviar o e-mail.
+ */
 router.post("/forgotPassword", forgotPasswordController.forgotPassword);
+
+/**
+ * @swagger
+ * /resetPassword:
+ *   post:
+ *     tags: [Redefinir Senha]
+ *     summary: Redefinir a senha do usuário
+ *     description: Permite que o usuário redefina sua senha usando um token de recuperação enviado por e-mail.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: O token gerado para a recuperação da senha.
+ *                 example: "abcd1234xyz"
+ *               newPassword:
+ *                 type: string
+ *                 description: A nova senha do usuário.
+ *                 example: "novaSenha123"
+ *     responses:
+ *       200:
+ *         description: Senha atualizada com sucesso.
+ *       400:
+ *         description: Token inválido, expirado ou senha não fornecida.
+ *       404:
+ *         description: Usuário não encontrado com o e-mail correspondente.
+ *       500:
+ *         description: Erro ao atualizar a senha no banco de dados.
+ */
 router.post("/resetPassword", forgotPasswordController.resetPassword);
 
 module.exports = router;
