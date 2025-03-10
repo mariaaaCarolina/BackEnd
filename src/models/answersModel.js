@@ -23,15 +23,35 @@ const getAllByQuestionId = async (questionId) => {
     return query[0];
 };
 
+const checkUserExists = async (userId) => {
+    const conn = await connect();
+    const [rows] = await conn.query(
+        "SELECT 1 FROM users WHERE id = ? LIMIT 1",
+        [userId]
+    );
+    return rows.length > 0;
+};
+
 const createAnswer = async (answerData) => {
     const conn = await connect();
     const { answer, questionId, userId } = answerData;
-    const [result] = await conn.query(
-        `INSERT INTO answers (answer, questionId, userId) VALUES (?, ?, ?)`,
-        [answer, questionId, userId]
-    );
-    console.log("Answer Data:", answerData);
-    return { id: result.insertId, ...answerData };
+
+    const userExists = await checkUserExists(userId);
+    if (!userExists) {
+        throw new Error("O usuário referenciado não existe.");
+    }
+
+    try {
+        const [result] = await conn.query(
+            `INSERT INTO answers (answer, questionId, userId) VALUES (?, ?, ?)`,
+            [answer, questionId, userId]
+        );
+        console.log("Answer Data:", answerData);
+        return { id: result.insertId, ...answerData };
+    } catch (error) {
+        console.error("Erro ao criar resposta:", error.message);
+        throw new Error("Erro ao criar resposta.");
+    }
 };
 
 const updateAnswer = async (id, answers) => {

@@ -48,17 +48,30 @@ const createCompany = async (req, res) => {
 const updateCompany = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedData = req.body;
+        const companyData = req.body;
+
+        if (!id || !companyData) {
+            return res
+                .status(400)
+                .json({ error: "ID e dados da empresa são obrigatórios." });
+        }
+
         const updatedCompany = await companyModel.updateCompany(
             id,
-            updatedData
+            companyData
         );
-        if (!updatedCompany) {
-            return res.status(404).json({ error: "Empresa não encontrado." });
+
+        if (updatedCompany) {
+            return res.status(200).json({
+                message: "Empresa atualizada com sucesso.",
+                data: updatedCompany,
+            });
+        } else {
+            return res.status(404).json({ error: "Empresa não encontrada." });
         }
-        return res.status(200).json(updatedCompany);
     } catch (error) {
-        return res.status(500).json({ error: "Erro ao atualizar a empresa." });
+        console.error("Erro ao atualizar empresa:", error);
+        return res.status(500).json({ error: "Erro interno no servidor." });
     }
 };
 

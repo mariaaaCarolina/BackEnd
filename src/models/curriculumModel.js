@@ -5,13 +5,13 @@ const connect = require("../connection");
 
 const getAll = async () => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM curriculum;");
+    const query = await conn.query("SELECT * FROM curriculums;");
     return query[0];
 };
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM curriculum WHERE id = ?", [
+    const query = await conn.query("SELECT * FROM curriculums WHERE id = ?", [
         id,
     ]);
     return query[0][0];
@@ -49,7 +49,7 @@ const createCurriculum = async (curriculum) => {
         }
 
         const [result] = await conn.query(
-            `INSERT INTO curriculum (id, dateOfBirth, age, gender, race, city, 
+            `INSERT INTO curriculums (id, dateOfBirth, age, gender, race, city, 
                 attached, description,  
                 address, addressNumber, cep, uf, userId) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
@@ -95,7 +95,7 @@ const updateCurriculum = async (id, curriculum) => {
         } = curriculum;
 
         const [result] = await conn.query(
-            `UPDATE curriculum 
+            `UPDATE curriculums
              SET dateOfBirth = ?, age = ?, gender = ?, race = ?, city = ?, address = ?, addressNumber = ?, 
              cep = ?, uf = ?, userId = ? 
              WHERE id = ?`,
@@ -132,7 +132,7 @@ const deleteCurriculum = async (id) => {
 
     try {
         const [result] = await conn.query(
-            "DELETE FROM curriculum WHERE id = ?",
+            "DELETE FROM curriculums WHERE id = ?",
             [id]
         );
         if (result.affectedRows === 0) {
@@ -147,36 +147,56 @@ const deleteCurriculum = async (id) => {
 };
 
 const addSchoolData = async (userId, data) => {
-    const conn = await connect();
-    const {
-        schoolName,
-        schoolYear,
-        schoolCity,
-        schoolStartDate,
-        schoolEndDate,
-        isCurrentlyStudying,
-    } = data;
+    try {
+        const conn = await connect();
 
-    const query = await conn.query(
-        "UPDATE curriculum SET schoolName = ?, schoolYear = ?, schoolCity = ?, schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ? WHERE id = ? ",
-        [
+        const {
             schoolName,
             schoolYear,
             schoolCity,
             schoolStartDate,
             schoolEndDate,
             isCurrentlyStudying,
-            userId,
-        ]
-    );
-    return query[0];
+        } = data;
+
+        if (!schoolName || !schoolCity || !schoolStartDate) {
+            throw new Error("Campos obrigatórios estão faltando.");
+        }
+        const [existing] = await conn.query(
+            "SELECT id FROM curriculums WHERE id = ?",
+            [userId]
+        );
+
+        if (existing.length === 0) {
+            throw new Error("Currículo não encontrado.");
+        }
+
+        // Atualizando os dados
+        const [result] = await conn.query(
+            "UPDATE  SET schoolName = ?, schoolYear = ?, schoolCity = ?, schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ? WHERE id = ?",
+            [
+                schoolName,
+                schoolYear,
+                schoolCity,
+                schoolStartDate,
+                schoolEndDate,
+                isCurrentlyStudying,
+                userId,
+            ]
+        );
+
+        return result;
+    } catch (error) {
+        console.error("Erro ao adicionar dados escolares:", error.message);
+        throw error;
+    }
 };
 
 const addDataToCurriculum = async (userId, data) => {
     const conn = await connect();
     const { description, attached } = data;
     const query =
-        "UPDATE curriculum SET description = ?, attached = ? WHERE id = ?";
+        "UPDATE curriculums SET description = ?, attached = ? WHERE id = ?";
     const [result] = await conn.query(query, [description, attached, userId]);
     return result;
 };

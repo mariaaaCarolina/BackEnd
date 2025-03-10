@@ -2,13 +2,15 @@ const connect = require("../connection");
 
 const getAll = async () => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM vacancy");
+    const query = await conn.query("SELECT * FROM vacancies");
     return query[0];
 };
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query(`SELECT * FROM vacancy WHERE id = ?`, [id]);
+    const query = await conn.query(`SELECT * FROM vacancies WHERE id = ?`, [
+        id,
+    ]);
     return query[0][0];
 };
 
@@ -31,7 +33,7 @@ const createVacancy = async (vacancy) => {
         } = vacancy;
 
         const [result] = await conn.query(
-            `INSERT INTO vacancy (title, description, aboutCompany, benefits, 
+            `INSERT INTO vacancies (title, description, aboutCompany, benefits, 
             requirements, modality, locality, uf, contact, salary, level, companyId) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
@@ -75,7 +77,7 @@ const updateVacancy = async (id, vacancyData) => {
             companyId,
         } = vacancyData;
         const [result] = await conn.query(
-            `UPDATE vacancy SET 
+            `UPDATE vacancies SET 
                 title = ?, 
                 description = ?, 
                 aboutCompany = ?, 
@@ -121,7 +123,7 @@ const updateIsActive = async (id, isActive) => {
     const conn = await connect();
     try {
         const [result] = await conn.query(
-            `UPDATE vacancy SET isActive = ? WHERE id = ?;`,
+            `UPDATE vacancies SET isActive = ? WHERE id = ?;`,
             [isActive, id]
         );
 
@@ -140,7 +142,7 @@ const updateIsFilled = async (id, isFilled) => {
     const conn = await connect();
     try {
         const [result] = await conn.query(
-            `UPDATE vacancy SET isFilled = ? WHERE id = ?;`,
+            `UPDATE vacancies SET isFilled = ? WHERE id = ?;`,
             [isFilled, id]
         );
 
@@ -169,9 +171,10 @@ const deleteVacancy = async (id) => {
 
         await conn.query(`DELETE FROM questions WHERE vacancyId = ?;`, [id]);
 
-        const [result] = await conn.query(`DELETE FROM vacancy WHERE id = ?;`, [
-            id,
-        ]);
+        const [result] = await conn.query(
+            `DELETE FROM vacancies WHERE id = ?;`,
+            [id]
+        );
 
         if (result.affectedRows === 0) {
             throw new Error("Vaga não encontrada.");

@@ -44,7 +44,7 @@ const updateCompetence = async (id, competences) => {
         const { name, curriculumId } = competences;
 
         const [result] = await conn.query(
-            "UPDATE coursesData SET name = ?, curriculumId = ? WHERE id = ?;",
+            "UPDATE competences SET name = ?, curriculumId = ? WHERE id = ?;",
             [name, curriculumId, id]
         );
         if (result.affectedRows === 0) {

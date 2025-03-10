@@ -59,16 +59,45 @@ const deleteCurriculum = async (req, res) => {
 };
 
 const addDataToCurriculum = async (req, res) => {
-    const id = req.params.id;
+    try {
+        const { id } = req.params;
+        const response = await curriculumModel.addDataToCurriculum(
+            id,
+            req.body
+        );
 
-    const response = await curriculumModel.addDataToCurriculum(id, req.body);
-    return res.status(200).send();
+        if (!response) {
+            return res.status(404).json({ error: "Currículo não encontrado." });
+        }
+
+        return res
+            .status(200)
+            .json({ message: "Dados adicionados com sucesso.", response });
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "Erro ao adicionar dados ao currículo." });
+    }
 };
 
 const addSchoolData = async (req, res) => {
-    const id = req.params.id;
-    const response = await curriculumModel.addSchoolData(id, req.body);
-    return res.status(200).send();
+    try {
+        const { id } = req.params;
+        const response = await curriculumModel.addSchoolData(id, req.body);
+
+        if (!response) {
+            return res.status(404).json({ error: "Currículo não encontrado." });
+        }
+
+        return res.status(200).json({
+            message: "Dados escolares adicionados com sucesso.",
+            response,
+        });
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "Erro ao adicionar dados escolares ao currículo." });
+    }
 };
 
 module.exports = {

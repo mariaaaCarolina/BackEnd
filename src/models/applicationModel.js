@@ -2,14 +2,14 @@ const connect = require("../connection");
 
 const getAll = async () => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM application;");
+    const query = await conn.query("SELECT * FROM applications;");
     return query[0];
 };
 
 const getById = async (id) => {
     const conn = await connect();
     const query = await conn.query(
-        "SELECT * FROM application WHERE userId = ?",
+        "SELECT * FROM applications WHERE userId = ?",
         [id]
     );
     return query[0];
@@ -19,7 +19,7 @@ const getByVacancyId = async (vacancyId) => {
     const conn = await connect();
     try {
         const query = await conn.query(
-            "SELECT * FROM application WHERE vacancyId = ?",
+            "SELECT * FROM applications WHERE vacancyId = ?",
             [vacancyId]
         );
         return query[0];
@@ -50,19 +50,26 @@ const createApplication = async (applicationData) => {
     const conn = await connect();
     try {
         const { vacancyId, userId } = applicationData;
-        const vacancyExists = await checkExistence("vacancy", vacancyId);
+
+        console.log("Verificando existência da vaga:", vacancyId);
+        const vacancyExists = await checkExistence("vacancies", vacancyId);
         if (!vacancyExists) {
             throw new Error("A vaga referenciada não existe.");
         }
+
+        console.log("Verificando existência do usuário:", userId);
         const userExists = await checkExistence("users", userId);
         if (!userExists) {
             throw new Error("O usuário referenciado não existe.");
         }
+
+        console.log("Inserindo aplicação no banco de dados...");
         const [result] = await conn.query(
-            `INSERT INTO application (vacancyId, userId) 
+            `INSERT INTO applications (vacancyId, userId) 
             VALUES (?, ?);`,
             [vacancyId, userId]
         );
+
         console.log("Application Data:", applicationData);
         return { id: result.insertId, ...applicationData };
     } catch (error) {
@@ -76,7 +83,7 @@ const updateApplication = async (id, application) => {
     const { vacancyId, userId } = application;
 
     const query = `
-        UPDATE application
+        UPDATE applications
         SET vacancyId = ?, userId = ?
     `;
 
@@ -100,7 +107,7 @@ const deleteApplication = async (userId, vacancyId) => {
         await conn.query(deleteResponsesQuery, [userId, vacancyId]);
 
         const deleteApplicationQuery = `
-            DELETE FROM application
+            DELETE FROM applications
             WHERE userId = ? AND vacancyId = ?
         `;
         const [result] = await conn.query(deleteApplicationQuery, [

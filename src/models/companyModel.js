@@ -63,57 +63,51 @@ const getById = async (id) => {
 };
 
 const updateCompany = async (id, company) => {
-    let conn;
-    try {
-        conn = await connect();
-        const {
-            name,
-            cnpj,
-            segment,
-            responsible,
-            email,
-            phoneNumber,
-            city,
-            cep,
-            address,
-            addressNumber,
-            uf,
-            password,
-            url,
-            logo,
-        } = company;
+    const conn = await connect();
+    const {
+        name,
+        cnpj,
+        segment,
+        responsible,
+        email,
+        phoneNumber,
+        city,
+        cep,
+        address,
+        addressNumber,
+        uf,
+        password,
+        url,
+        logo,
+    } = company;
 
-        const query = `
-            UPDATE companies
-            SET name = ?, cnpj = ?, segment = ?, responsible = ?, email = ?, phoneNumber = ?, city = ?, cep = ?, address = ?, addressNumber = ?, uf = ?, password = ?, url = ?, logo = ?
-            WHERE id = ?
-        `;
+    const query = `
+        UPDATE companies 
+        SET name = ?, cnpj = ?, segment = ?, responsible = ?, email = ?, 
+            phoneNumber = ?, city = ?, cep = ?, address = ?, addressNumber = ?, 
+            uf = ?, password = ?, url = ?, logo = ?
+        WHERE id = ?
+    `;
 
-        const [result] = await conn.query(query, [
-            name,
-            cnpj,
-            segment,
-            responsible,
-            email,
-            phoneNumber,
-            city,
-            cep,
-            address,
-            addressNumber,
-            uf,
-            password,
-            url,
-            logo,
-            id,
-        ]);
+    const [result] = await conn.query(query, [
+        name,
+        cnpj,
+        segment,
+        responsible,
+        email,
+        phoneNumber,
+        city,
+        cep,
+        address,
+        addressNumber,
+        uf,
+        password,
+        url,
+        logo,
+        id,
+    ]);
 
-        console.log("Query result:", result);
-
-        return result.affectedRows ? { id, ...company } : null;
-    } catch (err) {
-        console.error("Error during database query:", err);
-        throw new Error("Database query execution failed");
-    }
+    return result.affectedRows ? { id, ...company } : null;
 };
 
 const deleteCompany = async (id) => {
