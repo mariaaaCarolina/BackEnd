@@ -35,6 +35,7 @@ const updateUser = async (req, res) => {
         const { id } = req.params;
         const updatedData = req.body;
         const updatedUser = await userModel.updateUser(id, updatedData);
+
         if (!updatedUser) {
             return res.status(404).json({ error: "Usuário não encontrado." });
         }
@@ -59,53 +60,10 @@ const deleteUser = async (req, res) => {
     }
 };
 
-const addCurriculum = async (req, res) => {
-    const userId = req.params.id;
-    const { curriculumId } = req.body;
-
-    try {
-        const result = await userModel.addCurriculum(userId, curriculumId);
-        if (result.affectedRows > 0) {
-            return res
-                .status(200)
-                .send({ message: "Currículo atualizado com sucesso." });
-        } else {
-            return res.status(404).send({ message: "Usuário não encontrado." });
-        }
-    } catch (error) {
-        return res.status(500).send({
-            message: "Erro ao atualizar currículo",
-            error: error.message,
-        });
-    }
-};
-
-const deleteUserData = async (req, res) => {
-    const { userId, curriculumId } = req.params;
-
-    if (!userId || !curriculumId) {
-        return res
-            .status(400)
-            .json({ error: "userId e curriculumId são obrigatórios" });
-    }
-
-    try {
-        const result = await userModel.deleteUserData(userId, curriculumId);
-        res.status(200).json(result);
-    } catch (error) {
-        console.error("Erro ao excluir dados do usuário e currículo:", error);
-        res.status(500).json({
-            error: "Erro ao excluir dados do usuário e currículo",
-        });
-    }
-};
-
 module.exports = {
     getAll,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
-    deleteUserData,
-    addCurriculum,
 };

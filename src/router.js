@@ -13,6 +13,7 @@ const answersController = require("./controllers/answersController");
 const messagesController = require("./controllers/messagesController");
 const cancelledApplicationController = require("./controllers/cancelledApplicationController");
 const forgotPasswordController = require("./controllers/forgotPassword");
+const candidateController = requiere("./controllers/candidatesController");
 const router = express.Router();
 require("dotenv").config();
 
@@ -265,13 +266,16 @@ require("dotenv").config();
  */
 
 //Rotas para Usuários
-router.get("/users", userController.getAll);
-router.get("/users/:id", userController.getUserById);
-router.post("/users", userController.createUser);
-router.put("/users/:id", userController.updateUser);
-router.delete("/users/:id", userController.deleteUser);
-router.put("/users/:id/curriculum", userController.addCurriculum);
-router.delete("/userdata/:userId/:curriculumId", userController.deleteUserData);
+router.get("/candidates", candidateController.getAll);
+router.get("/candidate/:id", candidateController.getCandidateById);
+router.post("/candidate", candidateController.createCandidate);
+router.put("/candidate/:id", candidateController.updateCandidate);
+router.delete("/candidate/:id", candidateController.deleteCandidate);
+router.put("/candidate/:id/curriculum", candidateController.addCurriculum);
+router.delete(
+    "/candidateData/:candidateId/:curriculumId",
+    candidateController.deleteCandidateData
+);
 
 /**
  * @swagger
@@ -3261,5 +3265,11 @@ router.post("/forgotPassword", forgotPasswordController.forgotPassword);
  *         description: Erro ao atualizar a senha no banco de dados.
  */
 router.post("/resetPassword", forgotPasswordController.resetPassword);
+
+router.get("/users", userController.getAll);
+router.get("/user/:id", userController.getUserById);
+router.post("/user", userController.createUser);
+router.put("/user/:id", userController.updateUser);
+router.delete("/user/:id", userController.deleteUser);
 
 module.exports = router;
