@@ -12,8 +12,8 @@ const applicationController = require("./controllers/applicationController");
 const answersController = require("./controllers/answersController");
 const messagesController = require("./controllers/messagesController");
 const cancelledApplicationController = require("./controllers/cancelledApplicationController");
-const forgotPasswordController = require("./controllers/forgotPassword");
-const candidateController = requiere("./controllers/candidatesController");
+// const forgotPasswordController = require("./controllers/forgotPassword");
+const candidateController = require("./controllers/candidatesController");
 const router = express.Router();
 require("dotenv").config();
 
@@ -3230,7 +3230,7 @@ router.delete(
  *       500:
  *         description: Erro ao enviar o e-mail.
  */
-router.post("/forgotPassword", forgotPasswordController.forgotPassword);
+// router.post("/forgotPassword", forgotPasswordController.forgotPassword);
 
 /**
  * @swagger
@@ -3264,7 +3264,7 @@ router.post("/forgotPassword", forgotPasswordController.forgotPassword);
  *       500:
  *         description: Erro ao atualizar a senha no banco de dados.
  */
-router.post("/resetPassword", forgotPasswordController.resetPassword);
+// router.post("/resetPassword", forgotPasswordController.resetPassword);
 
 router.get("/users", userController.getAll);
 router.get("/user/:id", userController.getUserById);
