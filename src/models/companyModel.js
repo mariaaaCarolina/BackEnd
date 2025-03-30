@@ -14,34 +14,30 @@ const createCompany = async (company) => {
             cnpj,
             segment,
             responsible,
-            email,
             phoneNumber,
             city,
             cep,
             address,
             addressNumber,
             uf,
-            password,
             url,
             logo,
         } = company;
 
         const [result] = await conn.query(
-            `INSERT INTO companies (name, cnpj, segment, responsible, email, phoneNumber, city, cep, address, addressNumber, uf, password, url, logo) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO companies (name, cnpj, segment, responsible, phoneNumber, city, cep, address, addressNumber, uf, url, logo) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name,
                 cnpj,
                 segment,
                 responsible,
-                email,
                 phoneNumber,
                 city,
                 cep,
                 address,
                 addressNumber,
                 uf,
-                password,
                 url,
                 logo,
             ]
@@ -69,23 +65,21 @@ const updateCompany = async (id, company) => {
         cnpj,
         segment,
         responsible,
-        email,
         phoneNumber,
         city,
         cep,
         address,
         addressNumber,
         uf,
-        password,
         url,
         logo,
     } = company;
 
     const query = `
         UPDATE companies 
-        SET name = ?, cnpj = ?, segment = ?, responsible = ?, email = ?, 
+        SET name = ?, cnpj = ?, segment = ?, responsible = ?, 
             phoneNumber = ?, city = ?, cep = ?, address = ?, addressNumber = ?, 
-            uf = ?, password = ?, url = ?, logo = ?
+            uf = ?, url = ?, logo = ?
         WHERE id = ?
     `;
 
@@ -94,14 +88,12 @@ const updateCompany = async (id, company) => {
         cnpj,
         segment,
         responsible,
-        email,
         phoneNumber,
         city,
         cep,
         address,
         addressNumber,
         uf,
-        password,
         url,
         logo,
         id,

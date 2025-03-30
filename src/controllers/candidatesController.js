@@ -1,8 +1,8 @@
-const candidateModel = require("../models/candidatesModel");
+const candidatesModel = require("../models/candidatesModel");
 
 const getAll = async (req, res) => {
     try {
-        const candidate = await candidateModel.getAll();
+        const candidate = await candidatesModel.getAll();
         return res.status(200).json(candidate);
     } catch (error) {
         return res.status(500).json({ error: "Erro ao buscar candidatos." });
@@ -11,7 +11,7 @@ const getAll = async (req, res) => {
 
 const getCandidateById = async (req, res) => {
     try {
-        const candidate = await candidateModel.getById(req.params.id);
+        const candidate = await candidatesModel.getById(req.params.id);
         if (!candidate) {
             return res.status(404).json({ error: "Candidato não encontrado." });
         }
@@ -23,10 +23,24 @@ const getCandidateById = async (req, res) => {
 
 const createCandidate = async (req, res) => {
     try {
+        if (
+            !req.body.name ||
+            !req.body.cpf ||
+            !req.body.email ||
+            !req.body.phoneNumber ||
+            !req.body.password
+        ) {
+            console.log("Campos obrigatórios estão ausentes.");
+        }
+
         const newCandidate = await candidatesModel.createCandidate(req.body);
+        console.log("Candidato criado com sucesso:", newCandidate);
         return res.status(201).json(newCandidate);
     } catch (error) {
-        return res.status(500).json({ error: "Erro ao criar candidato." });
+        console.error("Erro ao criar candidato:", error.message, error.stack);
+        return res
+            .status(500)
+            .json({ error: error.message, stack: error.stack });
     }
 };
 

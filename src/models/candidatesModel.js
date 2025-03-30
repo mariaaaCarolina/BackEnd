@@ -10,9 +10,7 @@ const getAll = async () => {
                 candidates.id AS id, 
                 candidates.name, 
                 candidates.cpf, 
-                candidates.email, 
                 candidates.phoneNumber, 
-                candidates.password,
                 candidates.curriculumId AS curriculumId
             FROM candidates
         `);
@@ -34,20 +32,12 @@ const getById = async (id) => {
 const createCandidate = async (candidates) => {
     const conn = await connect();
     try {
-        const {
-            name,
-            cpf,
-            email,
-            phoneNumber,
-            password,
-            curriculumId,
-            vacancyId,
-        } = candidates;
+        const { name, cpf, phoneNumber, curriculumId, userId } = candidates;
 
         const [result] = await conn.query(
-            `INSERT INTO candidates (name, cpf, email, phoneNumber, password, curriculumId, vacancyId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?);`,
-            [name, cpf, email, phoneNumber, password, curriculumId, vacancyId]
+            `INSERT INTO candidates (name, cpf, phoneNumber, curriculumId, userId) 
+            VALUES (?, ?, ?, ?, ?);`,
+            [name, cpf, phoneNumber, curriculumId || null, userId || null]
         );
         return { id: result.insertId, ...candidates };
     } catch (error) {
@@ -58,23 +48,20 @@ const createCandidate = async (candidates) => {
 
 const updateCandidate = async (id, candidates) => {
     const conn = await connect();
-    const { name, cpf, email, phoneNumber, password, curriculumId, vacancyId } =
-        candidates;
+    const { name, cpf, phoneNumber, curriculumId, userId } = candidates;
 
     const query = `
         UPDATE candidates 
-        SET name = ?, cpf = ?, email = ?, phoneNumber = ?, password = ?, curriculumId = ?, vacancyId = ?
+        SET name = ?, cpf = ?, phoneNumber = ?, curriculumId = ?, userId = ?
         WHERE id = ?
     `;
 
     const [result] = await conn.query(query, [
         name,
         cpf,
-        email,
         phoneNumber,
-        password,
         curriculumId,
-        vacancyId,
+        userId,
         id,
     ]);
 
@@ -85,7 +72,7 @@ const deleteCandidate = async (id) => {
     const conn = await connect();
     try {
         await conn.query("DELETE FROM messages WHERE sender_id = ?", [id]);
-        await conn.query("DELETE FROM answers WHERE candidateId = ?", [id]);
+        // await conn.query("DELETE FROM answers WHERE candidateId = ?", [id]);
         const [result] = await conn.query(
             "DELETE FROM candidates WHERE id = ?",
             [id]

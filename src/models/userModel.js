@@ -5,7 +5,7 @@ const getAll = async () => {
     try {
         const conn = await connect();
         const [rows] = await conn.query(`
-            SELECT id, email, password, userType 
+            SELECT id, email, password, type 
             FROM users
         `);
         return rows;
@@ -24,13 +24,13 @@ const getById = async (id) => {
 const createUser = async (user) => {
     const conn = await connect();
     try {
-        const { email, password, userType } = user;
+        const { email, password, type } = user;
 
         const [result] = await conn.query(
-            `INSERT INTO users (email, password, userType) VALUES (?, ?, ?);`,
-            [email, password, userType]
+            `INSERT INTO users (email, password, type) VALUES (?, ?, ?);`,
+            [email, password, type]
         );
-        return { id: result.insertId, email, userType };
+        return { id: result.insertId, email, type };
     } catch (error) {
         console.error("Erro ao criar usuário: ", error.message);
         throw new Error("Erro ao criar usuário");
@@ -40,22 +40,17 @@ const createUser = async (user) => {
 const updateUser = async (id, user) => {
     const conn = await connect();
     try {
-        const { email, password, userType } = user;
+        const { email, password, type } = user;
 
         const query = `
             UPDATE users 
-            SET email = ?, password = ?, userType = ?
+            SET email = ?, password = ?, type = ?
             WHERE id = ?
         `;
 
-        const [result] = await conn.query(query, [
-            email,
-            password,
-            userType,
-            id,
-        ]);
+        const [result] = await conn.query(query, [email, password, type, id]);
 
-        return result.affectedRows ? { id, email, userType } : null;
+        return result.affectedRows ? { id, email, type } : null;
     } catch (error) {
         console.error("Erro ao atualizar usuário: ", error.message);
         throw new Error("Erro ao atualizar usuário");
