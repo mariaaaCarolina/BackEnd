@@ -1,3 +1,4 @@
+//teste
 const connect = require("../connection");
 const bcrypt = require("bcrypt");
 
