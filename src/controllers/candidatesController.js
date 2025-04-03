@@ -2,8 +2,8 @@ const candidatesModel = require("../models/candidatesModel");
 
 const getAll = async (req, res) => {
     try {
-        const candidate = await candidatesModel.getAll();
-        return res.status(200).json(candidate);
+        const candidates = await candidatesModel.getAll();
+        return res.status(200).json(candidates);
     } catch (error) {
         return res.status(500).json({ error: "Erro ao buscar candidatos." });
     }
@@ -11,7 +11,8 @@ const getAll = async (req, res) => {
 
 const getCandidateById = async (req, res) => {
     try {
-        const candidate = await candidatesModel.getById(req.params.id);
+        const { userId } = req.params;
+        const candidate = await candidatesModel.getByUserId(userId);
         if (!candidate) {
             return res.status(404).json({ error: "Candidato não encontrado." });
         }
@@ -46,10 +47,10 @@ const createCandidate = async (req, res) => {
 
 const updateCandidate = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { userId } = req.params;
         const updatedData = req.body;
         const updateCandidate = await candidatesModel.updateCandidate(
-            id,
+            userId,
             updatedData
         );
         if (!updateCandidate) {
@@ -63,8 +64,8 @@ const updateCandidate = async (req, res) => {
 
 const deleteCandidate = async (req, res) => {
     try {
-        const { id } = req.params;
-        const result = await candidatesModel.deleteCandidate(id);
+        const { userId } = req.params;
+        const result = await candidatesModel.deleteCandidate(userId);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: "Candidato não encontrado." });
@@ -77,12 +78,12 @@ const deleteCandidate = async (req, res) => {
 };
 
 const addCurriculum = async (req, res) => {
-    const candidateId = req.params.id;
+    const userId = req.params.userId;
     const { curriculumId } = req.body;
 
     try {
         const result = await candidatesModel.addCurriculum(
-            candidateId,
+            userId,
             curriculumId
         );
         if (result.affectedRows > 0) {
@@ -103,17 +104,17 @@ const addCurriculum = async (req, res) => {
 };
 
 const deleteCandidateData = async (req, res) => {
-    const { candidateId, curriculumId } = req.params;
+    const { userId, curriculumId } = req.params;
 
-    if (!candidateId || !curriculumId) {
+    if (!userId || !curriculumId) {
         return res
             .status(400)
-            .json({ error: "canadidateId e curriculumId são obrigatórios" });
+            .json({ error: "userId e curriculumId são obrigatórios" });
     }
 
     try {
         const result = await candidatesModel.deleteCandidateData(
-            candidateId,
+            userId,
             curriculumId
         );
         res.status(200).json(result);

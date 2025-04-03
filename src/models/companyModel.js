@@ -22,11 +22,12 @@ const createCompany = async (company) => {
             uf,
             url,
             logo,
+            userId,
         } = company;
 
         const [result] = await conn.query(
-            `INSERT INTO companies (name, cnpj, segment, responsible, phoneNumber, city, cep, address, addressNumber, uf, url, logo) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO companies (name, cnpj, segment, responsible, phoneNumber, city, cep, address, addressNumber, uf, url, logo, userId) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name,
                 cnpj,
@@ -40,25 +41,27 @@ const createCompany = async (company) => {
                 uf,
                 url,
                 logo,
+                userId,
             ]
         );
-        return { id: result.insertId, ...company };
+        return { userId: result.insertId, ...company };
     } catch (error) {
         console.error("Erro ao criar a empresa:", error.message);
         throw new Error("Erro ao criar a empresa");
     }
 };
 
-const getById = async (id) => {
+const getById = async (userId) => {
     const conn = await connect();
-    const [rows] = await conn.query("SELECT * FROM companies WHERE id = ?", [
-        id,
-    ]);
+    const [rows] = await conn.query(
+        "SELECT * FROM companies WHERE userId = ?",
+        [userId]
+    );
     if (rows.length === 0) throw new Error("Empresa não encontrada.");
     return rows[0];
 };
 
-const updateCompany = async (id, company) => {
+const updateCompany = async (userId, company) => {
     const conn = await connect();
     const {
         name,
@@ -80,7 +83,7 @@ const updateCompany = async (id, company) => {
         SET name = ?, cnpj = ?, segment = ?, responsible = ?, 
             phoneNumber = ?, city = ?, cep = ?, address = ?, addressNumber = ?, 
             uf = ?, url = ?, logo = ?
-        WHERE id = ?
+        WHERE userId = ?
     `;
 
     const [result] = await conn.query(query, [
@@ -96,34 +99,34 @@ const updateCompany = async (id, company) => {
         uf,
         url,
         logo,
-        id,
+        userId,
     ]);
 
-    return result.affectedRows ? { id, ...company } : null;
+    return result.affectedRows ? { userId, ...company } : null;
 };
 
-const deleteCompany = async (id) => {
+const deleteCompany = async (userId) => {
     const conn = await connect();
     const query = `
         DELETE FROM companies 
-        WHERE id = ?
+        WHERE userId = ?
     `;
-    const [result] = await conn.query(query, [id]);
+    const [result] = await conn.query(query, [userId]);
     return result;
 };
 
-const deleteCompanyData = async (companyId) => {
+const deleteCompanyData = async (userId) => {
     const conn = await connect();
     try {
         // todos `vacancyId` relacionados
         const [vacancies] = await conn.query(
-            "SELECT id FROM vacancy WHERE companyId = ?",
-            [companyId]
+            "SELECT id FROM vacancy WHERE companyId IN (SELECT id FROM companies WHERE userId = ?)",
+            [userId]
         );
         const vacancyIds = vacancies.map((vacancy) => vacancy.id);
 
         if (vacancyIds.length > 0) {
-            // todos as `questionId` associadas às vagas da empresa
+            // todas as `questionId` associadas às vagas da empresa
             const [questions] = await conn.query(
                 "SELECT id FROM questions WHERE vacancyId IN (?)",
                 [vacancyIds]
@@ -149,13 +152,14 @@ const deleteCompanyData = async (companyId) => {
             ]);
 
             // vagas da empresa
-            await conn.query("DELETE FROM vacancy WHERE companyId = ?", [
-                companyId,
-            ]);
+            await conn.query(
+                "DELETE FROM vacancy WHERE companyId IN (SELECT id FROM companies WHERE userId = ?)",
+                [userId]
+            );
         }
 
         // empresa
-        await conn.query("DELETE FROM companies WHERE id = ?", [companyId]);
+        await conn.query("DELETE FROM companies WHERE userId = ?", [userId]);
 
         return { message: "Dados excluídos com sucesso." };
     } catch (error) {

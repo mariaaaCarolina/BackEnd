@@ -21,8 +21,8 @@ const getAll = async (req, res) => {
 
 const getCompanyById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const company = await companyModel.getById(id); // Recupera a empresa do banco
+        const { userId } = req.params;
+        const company = await companyModel.getById(userId); // Recupera a empresa do banco
 
         if (!company) {
             return res.status(404).json({ error: "Empresa não encontrada." });
@@ -47,17 +47,17 @@ const createCompany = async (req, res) => {
 
 const updateCompany = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { userId } = req.params;
         const companyData = req.body;
 
-        if (!id || !companyData) {
-            return res
-                .status(400)
-                .json({ error: "ID e dados da empresa são obrigatórios." });
+        if (!userId || !companyData) {
+            return res.status(400).json({
+                error: "User ID e dados da empresa são obrigatórios.",
+            });
         }
 
         const updatedCompany = await companyModel.updateCompany(
-            id,
+            userId,
             companyData
         );
 
@@ -77,8 +77,8 @@ const updateCompany = async (req, res) => {
 
 const deleteCompany = async (req, res) => {
     try {
-        const { id } = req.params;
-        const result = await companyModel.deleteCompany(id);
+        const { userId } = req.params;
+        const result = await companyModel.deleteCompany(userId);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: "Empresa não encontrada." });
         }
@@ -90,10 +90,10 @@ const deleteCompany = async (req, res) => {
 };
 
 const deleteCompanyData = async (req, res) => {
-    const { id } = req.params;
+    const { userId } = req.params;
 
     try {
-        const result = await companyModel.deleteCompanyData(id);
+        const result = await companyModel.deleteCompanyData(userId);
         res.status(200).json(result);
     } catch (error) {
         console.error("Erro ao excluir dados da empresa:", error);

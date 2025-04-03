@@ -11,7 +11,8 @@ const getAll = async () => {
                 candidates.name, 
                 candidates.cpf, 
                 candidates.phoneNumber, 
-                candidates.curriculumId AS curriculumId
+                candidates.curriculumId AS curriculumId,
+                candidates.userId
             FROM candidates
         `);
         return rows;
@@ -21,11 +22,12 @@ const getAll = async () => {
     }
 };
 
-const getById = async (id) => {
+const getById = async (userId) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM candidates WHERE id = ?", [
-        id,
-    ]);
+    const query = await conn.query(
+        "SELECT * FROM candidates WHERE userId = ?",
+        [userId]
+    );
     return query[0][0]; // Retorna um único candidato
 };
 
@@ -46,14 +48,14 @@ const createCandidate = async (candidates) => {
     }
 };
 
-const updateCandidate = async (id, candidates) => {
+const updateCandidate = async (userId, candidates) => {
     const conn = await connect();
-    const { name, cpf, phoneNumber, curriculumId, userId } = candidates;
+    const { name, cpf, phoneNumber, curriculumId } = candidates;
 
     const query = `
         UPDATE candidates 
-        SET name = ?, cpf = ?, phoneNumber = ?, curriculumId = ?, userId = ?
-        WHERE id = ?
+        SET name = ?, cpf = ?, phoneNumber = ?, curriculumId = ?
+        WHERE userId = ?
     `;
 
     const [result] = await conn.query(query, [
@@ -62,20 +64,18 @@ const updateCandidate = async (id, candidates) => {
         phoneNumber,
         curriculumId,
         userId,
-        id,
     ]);
 
-    return result.affectedRows ? { id, ...candidates } : null;
+    return result.affectedRows ? { userId, ...candidates } : null;
 };
 
-const deleteCandidate = async (id) => {
+const deleteCandidate = async (userId) => {
     const conn = await connect();
     try {
-        await conn.query("DELETE FROM messages WHERE sender_id = ?", [id]);
-        // await conn.query("DELETE FROM answers WHERE candidateId = ?", [id]);
+        await conn.query("DELETE FROM messages WHERE sender_id = ?", [userId]);
         const [result] = await conn.query(
-            "DELETE FROM candidates WHERE id = ?",
-            [id]
+            "DELETE FROM candidates WHERE userId = ?",
+            [userId]
         );
 
         return result;
@@ -85,19 +85,17 @@ const deleteCandidate = async (id) => {
     }
 };
 
-const addCurriculum = async (candidateId, curriculumId) => {
+const addCurriculum = async (userId, curriculumId) => {
     const conn = await connect();
-    const query = "UPDATE candidates SET curriculumId = ? WHERE id = ?";
-    const [result] = await conn.query(query, [curriculumId, candidateId]);
+    const query = "UPDATE candidates SET curriculumId = ? WHERE userId = ?";
+    const [result] = await conn.query(query, [curriculumId, userId]);
     return result;
 };
 
-const deleteCandidateData = async (candidateId, curriculumId, id) => {
+const deleteCandidateData = async (userId, curriculumId) => {
     const conn = await connect();
     try {
-        await conn.query("DELETE FROM application WHERE candidateId = ?", [
-            candidateId,
-        ]);
+        await conn.query("DELETE FROM application WHERE userId = ?", [userId]);
         await conn.query("DELETE FROM academicData WHERE curriculumId = ?", [
             curriculumId,
         ]);
@@ -110,8 +108,8 @@ const deleteCandidateData = async (candidateId, curriculumId, id) => {
         await conn.query("DELETE FROM curriculum WHERE id = ?", [curriculumId]);
 
         await conn.query(
-            "UPDATE candidates SET curriculumId = NULL WHERE id = ?",
-            [candidateId]
+            "UPDATE candidates SET curriculumId = NULL WHERE userId = ?",
+            [userId]
         );
         return { message: "Dados excluídos com sucesso." };
     } catch (error) {
