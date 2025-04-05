@@ -9,15 +9,18 @@ const getAll = async (req, res) => {
     }
 };
 
+// controller
 const getCandidateById = async (req, res) => {
     try {
-        const { userId } = req.params;
-        const candidate = await candidatesModel.getByUserId(userId);
+        const { id } = req.params;
+        console.log("userId recebido:", id);
+        const candidate = await candidatesModel.getById(Number(id));
         if (!candidate) {
             return res.status(404).json({ error: "Candidato não encontrado." });
         }
         return res.status(200).json(candidate);
     } catch (error) {
+        console.error("Erro:", error);
         return res.status(500).json({ error: "Erro ao buscar candidato." });
     }
 };
