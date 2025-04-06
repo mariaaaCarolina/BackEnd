@@ -267,7 +267,7 @@ require("dotenv").config();
 
 //Rotas para Usuários
 router.get("/candidates", candidateController.getAll);
-router.get("/candidate/:id", candidateController.getCandidateById);
+router.get("/candidate/:userId", candidateController.getCandidateById);
 router.post("/candidate", candidateController.createCandidate);
 router.put("/candidate/:id", candidateController.updateCandidate);
 router.delete("/candidate/:id", candidateController.deleteCandidate);

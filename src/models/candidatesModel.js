@@ -22,9 +22,12 @@ const getAll = async () => {
     }
 };
 
-const getById = async (id) => {
+const getById = async (userId) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM users WHERE id = ?", [id]);
+    const query = await conn.query(
+        "SELECT * FROM candidates WHERE userId = ?",
+        [userId]
+    );
     console.log("Resultado da query:", query[0]);
     return query[0][0];
 };
