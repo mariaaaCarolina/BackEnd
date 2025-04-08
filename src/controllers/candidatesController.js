@@ -9,7 +9,6 @@ const getAll = async (req, res) => {
     }
 };
 
-// controller
 const getCandidateById = async (req, res) => {
     try {
         const { userId } = req.params;

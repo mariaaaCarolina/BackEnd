@@ -546,7 +546,7 @@ router.delete(
 
 // Rotas para Empresas
 router.get("/companies", companyController.getAll);
-router.get("/companies/:id", companyController.getCompanyById);
+router.get("/companies/:userId", companyController.getCompanyById);
 router.post("/companies", companyController.createCompany);
 router.put("/companies/:id", companyController.updateCompany);
 router.delete("/companies/:id", companyController.deleteCompany);
@@ -554,7 +554,7 @@ router.delete("/company/:id", companyController.deleteCompanyData);
 
 /**
  * @swagger
- * tags:
+ * tags:s
  *   name: Curriculums
  *   description: Gerenciamento de currículos
  */
