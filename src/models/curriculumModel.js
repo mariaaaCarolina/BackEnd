@@ -1,6 +1,3 @@
-// const { query } = require("express");
-// const multer = require("multer");
-// const path = require("path");
 const connect = require("../connection");
 
 const getAll = async () => {
@@ -32,27 +29,15 @@ const createCurriculum = async (curriculum) => {
             cep,
             uf,
             description,
-            userId,
         } = curriculum;
 
         const attached = curriculum.attached ? curriculum.attached : null;
 
-        const [userCheck] = await conn.query(
-            "SELECT id FROM users WHERE id = ?",
-            [userId]
-        );
-
-        if (userCheck.length === 0) {
-            throw new Error(
-                `O userId ${userId} não existe. Verifique o ID do usuário.`
-            );
-        }
-
         const [result] = await conn.query(
             `INSERT INTO curriculums (id, dateOfBirth, age, gender, race, city, 
                 attached, description,  
-                address, addressNumber, cep, uf, userId) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                address, addressNumber, cep, uf) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 id,
                 dateOfBirth,
@@ -66,7 +51,6 @@ const createCurriculum = async (curriculum) => {
                 addressNumber,
                 cep,
                 uf,
-                userId,
             ]
         );
 
@@ -91,13 +75,12 @@ const updateCurriculum = async (id, curriculum) => {
             addressNumber,
             cep,
             uf,
-            userId,
         } = curriculum;
 
         const [result] = await conn.query(
             `UPDATE curriculums
              SET dateOfBirth = ?, age = ?, gender = ?, race = ?, city = ?, address = ?, addressNumber = ?, 
-             cep = ?, uf = ?, userId = ? 
+             cep = ?, uf = ? 
              WHERE id = ?`,
             [
                 dateOfBirth,
@@ -109,7 +92,6 @@ const updateCurriculum = async (id, curriculum) => {
                 addressNumber,
                 cep,
                 uf,
-                userId,
                 id,
             ]
         );
@@ -162,6 +144,7 @@ const addSchoolData = async (userId, data) => {
         if (!schoolName || !schoolCity || !schoolStartDate) {
             throw new Error("Campos obrigatórios estão faltando.");
         }
+
         const [existing] = await conn.query(
             "SELECT id FROM curriculums WHERE id = ?",
             [userId]
@@ -171,9 +154,8 @@ const addSchoolData = async (userId, data) => {
             throw new Error("Currículo não encontrado.");
         }
 
-        // Atualizando os dados
         const [result] = await conn.query(
-            "UPDATE  SET schoolName = ?, schoolYear = ?, schoolCity = ?, schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ? WHERE id = ?",
+            "UPDATE curriculums SET schoolName = ?, schoolYear = ?, schoolCity = ?, schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ? WHERE id = ?",
             [
                 schoolName,
                 schoolYear,
