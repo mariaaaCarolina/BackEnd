@@ -28,24 +28,16 @@ const createCurriculum = async (curriculum) => {
             addressNumber,
             cep,
             uf,
-            attached = null,
             description,
-            schoolName,
-            schoolYear,
-            schoolCity,
-            schoolStartDate,
-            schoolEndDate,
-            isCurrentlyStudying,
         } = curriculum;
 
+        const attached = curriculum.attached ? curriculum.attached : null;
+
         const [result] = await conn.query(
-            `INSERT INTO curriculums (
-                id, dateOfBirth, age, gender, race, city, 
-                address, addressNumber, cep, uf, 
-                attached, description, 
-                schoolName, schoolYear, schoolCity, 
-                schoolStartDate, schoolEndDate, isCurrentlyStudying
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            `INSERT INTO curriculums (id, dateOfBirth, age, gender, race, city, 
+                attached, description,  
+                address, addressNumber, cep, uf) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 id,
                 dateOfBirth,
@@ -53,18 +45,12 @@ const createCurriculum = async (curriculum) => {
                 gender,
                 race,
                 city,
+                attached,
+                description,
                 address,
                 addressNumber,
                 cep,
                 uf,
-                attached,
-                description,
-                schoolName,
-                schoolYear,
-                schoolCity,
-                schoolStartDate,
-                schoolEndDate,
-                isCurrentlyStudying,
             ]
         );
 
@@ -89,23 +75,12 @@ const updateCurriculum = async (id, curriculum) => {
             addressNumber,
             cep,
             uf,
-            attached = null,
-            description,
-            schoolName,
-            schoolYear,
-            schoolCity,
-            schoolStartDate,
-            schoolEndDate,
-            isCurrentlyStudying,
         } = curriculum;
 
         const [result] = await conn.query(
             `UPDATE curriculums
-             SET dateOfBirth = ?, age = ?, gender = ?, race = ?, city = ?, 
-                 address = ?, addressNumber = ?, cep = ?, uf = ?, 
-                 attached = ?, description = ?, 
-                 schoolName = ?, schoolYear = ?, schoolCity = ?, 
-                 schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ?
+             SET dateOfBirth = ?, age = ?, gender = ?, race = ?, city = ?, address = ?, addressNumber = ?, 
+             cep = ?, uf = ? 
              WHERE id = ?`,
             [
                 dateOfBirth,
@@ -117,14 +92,6 @@ const updateCurriculum = async (id, curriculum) => {
                 addressNumber,
                 cep,
                 uf,
-                attached,
-                description,
-                schoolName,
-                schoolYear,
-                schoolCity,
-                schoolStartDate,
-                schoolEndDate,
-                isCurrentlyStudying,
                 id,
             ]
         );
