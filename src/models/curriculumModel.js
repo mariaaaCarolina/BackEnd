@@ -176,10 +176,15 @@ const addSchoolData = async (userId, data) => {
 
 const addDataToCurriculum = async (userId, data) => {
     const conn = await connect();
-    const { description, attached } = data;
+    const { description, attached, interestArea } = data;
     const query =
-        "UPDATE curriculums SET description = ?, attached = ? WHERE id = ?";
-    const [result] = await conn.query(query, [description, attached, userId]);
+        "UPDATE curriculums SET description = ?, attached = ?, interestArea = ? WHERE id = ?";
+    const [result] = await conn.query(query, [
+        description,
+        attached,
+        interestArea,
+        userId,
+    ]);
     return result;
 };
 

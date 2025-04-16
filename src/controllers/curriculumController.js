@@ -60,9 +60,9 @@ const deleteCurriculum = async (req, res) => {
 
 const addDataToCurriculum = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { userId } = req.params;
         const response = await curriculumModel.addDataToCurriculum(
-            id,
+            userId,
             req.body
         );
 
@@ -74,6 +74,7 @@ const addDataToCurriculum = async (req, res) => {
             .status(200)
             .json({ message: "Dados adicionados com sucesso.", response });
     } catch (error) {
+        console.error("Erro ao adicionar dados ao currículo:", error); // <-- Aqui está o log do erro
         return res
             .status(500)
             .json({ error: "Erro ao adicionar dados ao currículo." });
