@@ -30,27 +30,33 @@ const createVacancy = async (vacancy) => {
             salary,
             level,
             companyId,
+            companyName,
         } = vacancy;
 
-        const [result] = await conn.query(
-            `INSERT INTO vacancies (title, description, aboutCompany, benefits, 
-            requirements, modality, locality, uf, contact, salary, level, companyId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-            [
-                title,
-                description,
-                aboutCompany,
-                benefits,
-                requirements,
-                modality,
-                locality,
-                uf,
-                contact,
-                salary,
-                level,
-                companyId,
-            ]
-        );
+        // Verifique o número de parâmetros e colunas
+        const query = `INSERT INTO vacancies (title, description, aboutCompany, benefits, 
+            requirements, modality, locality, uf, contact, salary, level, companyId, companyName) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+
+        const values = [
+            title,
+            description,
+            aboutCompany,
+            benefits,
+            requirements,
+            modality,
+            locality,
+            uf,
+            contact,
+            salary,
+            level,
+            companyId,
+            companyName,
+        ];
+
+        console.log("Valores sendo inseridos:", values); // Debugging
+
+        const [result] = await conn.query(query, values);
 
         return { id: result.insertId, ...vacancy };
     } catch (error) {
@@ -75,6 +81,7 @@ const updateVacancy = async (id, vacancyData) => {
             salary,
             level,
             companyId,
+            companyName,
         } = vacancyData;
         const [result] = await conn.query(
             `UPDATE vacancies SET 
@@ -89,7 +96,8 @@ const updateVacancy = async (id, vacancyData) => {
                 contact = ?, 
                 salary = ?, 
                 level = ?, 
-                companyId = ? 
+                companyId = ?,
+                companyName = ?, 
             WHERE id = ?;`,
             [
                 title,
@@ -104,6 +112,7 @@ const updateVacancy = async (id, vacancyData) => {
                 salary,
                 level,
                 companyId,
+                companyName,
                 id,
             ]
         );
