@@ -49,7 +49,7 @@ const checkExistence = async (table, id) => {
 const createApplication = async (applicationData) => {
     const conn = await connect();
     try {
-        const { vacancyId, userId } = applicationData;
+        const { vacancyId, candidateId } = applicationData;
 
         // Verifica se a vaga existe
         const vacancyExists = await checkExistence("vacancies", vacancyId);
@@ -57,31 +57,27 @@ const createApplication = async (applicationData) => {
             throw new Error("A vaga referenciada não existe.");
         }
 
-        // Verifica se o usuário existe na tabela 'users'
-        const userExists = await checkExistence("users", userId);
-        if (!userExists) {
-            throw new Error("O usuário referenciado não existe.");
-        }
-
-        // Aqui busca o ID do candidato com base no userId
+        // Verifica se o candidato existe na tabela 'candidates'
         const [rows] = await conn.query(
-            "SELECT id FROM candidates WHERE userId = ?",
-            [userId]
+            "SELECT id FROM candidates WHERE id = ?",
+            [candidateId]
         );
         if (rows.length === 0) {
-            throw new Error("Candidato não encontrado para este usuário.");
+            throw new Error("Candidato não encontrado.");
         }
 
-        const candidateId = rows[0].id;
-
-        // Insere a aplicação usando o id da tabela candidates
+        // Insere a aplicação com candidateId
         const [result] = await conn.query(
             `INSERT INTO applications (vacancyId, userId) 
-            VALUES (?, ?);`,
+             VALUES (?, ?);`,
             [vacancyId, candidateId]
         );
 
-        return { id: result.insertId, vacancyId, userId };
+        return {
+            id: result.insertId, // ID da nova candidatura
+            vacancyId,
+            candidateId,
+        };
     } catch (error) {
         console.error("Erro ao criar dados da candidatura:", error.message);
         throw new Error("Erro ao criar dados da candidatura.");
