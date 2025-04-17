@@ -51,27 +51,37 @@ const createApplication = async (applicationData) => {
     try {
         const { vacancyId, userId } = applicationData;
 
-        console.log("Verificando existência da vaga:", vacancyId);
+        // Verifica se a vaga existe
         const vacancyExists = await checkExistence("vacancies", vacancyId);
         if (!vacancyExists) {
             throw new Error("A vaga referenciada não existe.");
         }
 
-        console.log("Verificando existência do usuário:", userId);
+        // Verifica se o usuário existe na tabela 'users'
         const userExists = await checkExistence("users", userId);
         if (!userExists) {
             throw new Error("O usuário referenciado não existe.");
         }
 
-        console.log("Inserindo aplicação no banco de dados...");
+        // Aqui busca o ID do candidato com base no userId
+        const [rows] = await conn.query(
+            "SELECT id FROM candidates WHERE userId = ?",
+            [userId]
+        );
+        if (rows.length === 0) {
+            throw new Error("Candidato não encontrado para este usuário.");
+        }
+
+        const candidateId = rows[0].id;
+
+        // Insere a aplicação usando o id da tabela candidates
         const [result] = await conn.query(
             `INSERT INTO applications (vacancyId, userId) 
             VALUES (?, ?);`,
-            [vacancyId, userId]
+            [vacancyId, candidateId]
         );
 
-        console.log("Application Data:", applicationData);
-        return { id: result.insertId, ...applicationData };
+        return { id: result.insertId, vacancyId, userId };
     } catch (error) {
         console.error("Erro ao criar dados da candidatura:", error.message);
         throw new Error("Erro ao criar dados da candidatura.");
