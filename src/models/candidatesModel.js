@@ -22,12 +22,21 @@ const getAll = async () => {
     }
 };
 
-const getById = async (userId) => {
+const getByUserId = async (userId) => {
     const conn = await connect();
     const query = await conn.query(
         "SELECT * FROM candidates WHERE userId = ?",
         [userId]
     );
+    console.log("Resultado da query:", query[0]);
+    return query[0][0];
+};
+
+const getById = async (id) => {
+    const conn = await connect();
+    const query = await conn.query("SELECT * FROM candidates WHERE id = ?", [
+        id,
+    ]);
     console.log("Resultado da query:", query[0]);
     return query[0][0];
 };
@@ -121,6 +130,7 @@ const deleteCandidateData = async (userId, curriculumId) => {
 
 module.exports = {
     getAll,
+    getByUserId,
     getById,
     createCandidate,
     updateCandidate,

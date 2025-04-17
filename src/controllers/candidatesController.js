@@ -11,9 +11,24 @@ const getAll = async (req, res) => {
 
 const getCandidateById = async (req, res) => {
     try {
+        const { id } = req.params;
+        console.log("Id recebido:", id);
+        const candidate = await candidatesModel.getById(Number(id));
+        if (!candidate) {
+            return res.status(404).json({ error: "Candidato não encontrado." });
+        }
+        return res.status(200).json(candidate);
+    } catch (error) {
+        console.error("Erro:", error);
+        return res.status(500).json({ error: "Erro ao buscar candidato." });
+    }
+};
+
+const getCandidateByUserId = async (req, res) => {
+    try {
         const { userId } = req.params;
         console.log("userId recebido:", userId);
-        const candidate = await candidatesModel.getById(Number(userId));
+        const candidate = await candidatesModel.getByUserId(Number(userId));
         if (!candidate) {
             return res.status(404).json({ error: "Candidato não encontrado." });
         }
@@ -131,6 +146,7 @@ const deleteCandidateData = async (req, res) => {
 module.exports = {
     getAll,
     getCandidateById,
+    getCandidateByUserId,
     createCandidate,
     updateCandidate,
     deleteCandidate,
