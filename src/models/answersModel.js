@@ -23,31 +23,37 @@ const getAllByQuestionId = async (questionId) => {
     return query[0];
 };
 
-const checkUserExists = async (userId) => {
+const getCandidateIdById = async (id) => {
     const conn = await connect();
     const [rows] = await conn.query(
-        "SELECT 1 FROM users WHERE id = ? LIMIT 1",
-        [userId]
+        "SELECT id FROM candidates WHERE id = ? LIMIT 1",
+        [id]
     );
-    return rows.length > 0;
+    return rows.length > 0 ? rows[0].id : null;
 };
 
 const createAnswer = async (answerData) => {
     const conn = await connect();
     const { answer, questionId, userId } = answerData;
 
-    const userExists = await checkUserExists(userId);
-    if (!userExists) {
-        throw new Error("O usuário referenciado não existe.");
+    const candidateId = await getCandidateIdById(userId);
+    if (!candidateId) {
+        throw new Error(
+            "O candidato vinculado a esse usuário não foi encontrado."
+        );
     }
 
     try {
         const [result] = await conn.query(
             `INSERT INTO answers (answer, questionId, userId) VALUES (?, ?, ?)`,
-            [answer, questionId, userId]
+            [answer, questionId, candidateId]
         );
-        console.log("Answer Data:", answerData);
-        return { id: result.insertId, ...answerData };
+        console.log("Answer Data:", {
+            answer,
+            questionId,
+            userId: candidateId,
+        });
+        return { id: result.insertId, answer, questionId, userId: candidateId };
     } catch (error) {
         console.error("Erro ao criar resposta:", error.message);
         throw new Error("Erro ao criar resposta.");
@@ -94,6 +100,7 @@ const deleteAnswer = async (id) => {
 module.exports = {
     getAll,
     getById,
+    getCandidateIdById,
     getAllByQuestionId,
     createAnswer,
     updateAnswer,
