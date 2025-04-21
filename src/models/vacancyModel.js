@@ -97,7 +97,7 @@ const updateVacancy = async (id, vacancyData) => {
                 salary = ?, 
                 level = ?, 
                 companyId = ?,
-                companyName = ?, 
+                companyName = ?
             WHERE id = ?;`,
             [
                 title,
