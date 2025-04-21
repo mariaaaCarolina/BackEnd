@@ -95,10 +95,10 @@ const deleteCandidate = async (userId) => {
     }
 };
 
-const addCurriculum = async (userId, curriculumId) => {
+const addCurriculum = async (id, curriculumId) => {
     const conn = await connect();
-    const query = "UPDATE candidates SET curriculumId = ? WHERE userId = ?";
-    const [result] = await conn.query(query, [curriculumId, userId]);
+    const query = "UPDATE candidates SET curriculumId = ? WHERE id = ?";
+    const [result] = await conn.query(query, [curriculumId, id]);
     return result;
 };
 

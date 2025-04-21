@@ -95,14 +95,11 @@ const deleteCandidate = async (req, res) => {
 };
 
 const addCurriculum = async (req, res) => {
-    const userId = req.params.userId;
+    const id = req.params.id;
     const { curriculumId } = req.body;
 
     try {
-        const result = await candidatesModel.addCurriculum(
-            userId,
-            curriculumId
-        );
+        const result = await candidatesModel.addCurriculum(id, curriculumId);
         if (result.affectedRows > 0) {
             return res
                 .status(200)
