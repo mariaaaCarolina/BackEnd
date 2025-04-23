@@ -62,19 +62,21 @@ const updateCandidate = async (userId, candidate) => {
     const conn = await connect();
     const { name, cpf, phoneNumber, curriculumId } = candidate;
 
+    const cleanedCpf = cpf.trim();
+
     console.log("Atualizando candidato com dados:", {
         userId,
         name,
-        cpf,
+        cpf: cleanedCpf,
         phoneNumber,
         curriculumId,
     });
-
-    // Verifica se outro usuário já tem esse CPF
     const [existing] = await conn.query(
         `SELECT * FROM candidates WHERE cpf = ? AND userId != ?`,
-        [cpf, userId]
+        [cleanedCpf, userId]
     );
+
+    console.log("Candidatos com o mesmo CPF e userId diferente:", existing);
 
     if (existing.length > 0) {
         const err = new Error("CPF já cadastrado para outro candidato.");
@@ -90,13 +92,15 @@ const updateCandidate = async (userId, candidate) => {
 
     const [result] = await conn.query(query, [
         name,
-        cpf,
+        cleanedCpf,
         phoneNumber,
         curriculumId ?? null,
         userId,
     ]);
 
-    return result.affectedRows ? { userId, ...candidate } : null;
+    return result.affectedRows
+        ? { userId, name, cpf: cleanedCpf, phoneNumber, curriculumId }
+        : null;
 };
 
 const deleteCandidate = async (userId) => {
