@@ -58,9 +58,29 @@ const createCandidate = async (candidates) => {
     }
 };
 
-const updateCandidate = async (userId, candidates) => {
+const updateCandidate = async (userId, candidate) => {
     const conn = await connect();
-    const { name, cpf, phoneNumber, curriculumId } = candidates;
+    const { name, cpf, phoneNumber, curriculumId } = candidate;
+
+    console.log("Atualizando candidato com dados:", {
+        userId,
+        name,
+        cpf,
+        phoneNumber,
+        curriculumId,
+    });
+
+    // Verifica se outro usuário já tem esse CPF
+    const [existing] = await conn.query(
+        `SELECT * FROM candidates WHERE cpf = ? AND userId != ?`,
+        [cpf, userId]
+    );
+
+    if (existing.length > 0) {
+        const err = new Error("CPF já cadastrado para outro candidato.");
+        err.code = "DUPLICATE_CPF";
+        throw err;
+    }
 
     const query = `
         UPDATE candidates 
@@ -72,11 +92,11 @@ const updateCandidate = async (userId, candidates) => {
         name,
         cpf,
         phoneNumber,
-        curriculumId,
+        curriculumId ?? null,
         userId,
     ]);
 
-    return result.affectedRows ? { userId, ...candidates } : null;
+    return result.affectedRows ? { userId, ...candidate } : null;
 };
 
 const deleteCandidate = async (userId) => {

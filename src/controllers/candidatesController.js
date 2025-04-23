@@ -66,18 +66,37 @@ const updateCandidate = async (req, res) => {
     try {
         const { userId } = req.params;
         const updatedData = req.body;
-        const updateCandidate = await candidatesModel.updateCandidate(
+
+        const updatedCandidate = await candidatesModel.updateCandidate(
             userId,
             updatedData
         );
-        if (!updateCandidate) {
+
+        if (!updatedCandidate) {
             return res.status(404).json({ error: "Candidato não encontrado." });
         }
-        return res.status(200).json(updateCandidate);
+
+        return res.status(200).json(updatedCandidate);
     } catch (error) {
-        return res.status(500).json({ error: "Erro ao atualizar candidato." });
+        console.error("Erro ao atualizar candidato:", error);
+
+        if (
+            error.message.includes("Duplicate entry") &&
+            error.message.includes("cpf")
+        ) {
+            return res.status(400).json({
+                error: "CPF já cadastrado para outro candidato.",
+            });
+        }
+
+        return res.status(500).json({
+            error: "Erro ao atualizar candidato.",
+            details: error.message,
+        });
     }
 };
+
+module.exports = { updateCandidate };
 
 const deleteCandidate = async (req, res) => {
     try {

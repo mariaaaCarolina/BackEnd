@@ -270,7 +270,7 @@ router.get("/candidates", candidateController.getAll);
 router.get("/candidate/:userId", candidateController.getCandidateByUserId);
 router.get("/candidateid/:id", candidateController.getCandidateById);
 router.post("/candidate", candidateController.createCandidate);
-router.put("/candidate/:id", candidateController.updateCandidate);
+router.put("/candidate/:userId", candidateController.updateCandidate);
 router.delete("/candidate/:id", candidateController.deleteCandidate);
 router.put("/candidate/:id/curriculum", candidateController.addCurriculum);
 router.delete(
@@ -549,7 +549,7 @@ router.delete(
 router.get("/companies", companyController.getAll);
 router.get("/companies/:userId", companyController.getCompanyById);
 router.post("/companies", companyController.createCompany);
-router.put("/companies/:id", companyController.updateCompany);
+router.put("/companies/:userId", companyController.updateCompany);
 router.delete("/companies/:id", companyController.deleteCompany);
 router.delete("/company/:id", companyController.deleteCompanyData);
 
