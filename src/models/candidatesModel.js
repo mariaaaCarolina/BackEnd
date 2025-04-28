@@ -60,8 +60,7 @@ const createCandidate = async (candidates) => {
 
 const updateCandidate = async (userId, candidate) => {
     const conn = await connect();
-    const { name, cpf, phoneNumber, curriculumId } = candidate;
-
+    const { name, cpf, phoneNumber } = candidate;
     const cleanedCpf = cpf.trim();
 
     console.log("Atualizando candidato com dados:", {
@@ -69,37 +68,65 @@ const updateCandidate = async (userId, candidate) => {
         name,
         cpf: cleanedCpf,
         phoneNumber,
-        curriculumId,
     });
-    const [existing] = await conn.query(
-        `SELECT * FROM candidates WHERE cpf = ? AND userId != ?`,
-        [cleanedCpf, userId]
+
+    // Primeiro, busca o CPF atual desse usuário
+    const [currentRows] = await conn.query(
+        `SELECT cpf FROM candidates WHERE userId = ?`,
+        [userId]
     );
 
-    console.log("Candidatos com o mesmo CPF e userId diferente:", existing);
-
-    if (existing.length > 0) {
-        const err = new Error("CPF já cadastrado para outro candidato.");
-        err.code = "DUPLICATE_CPF";
+    if (currentRows.length === 0) {
+        const err = new Error("Candidato não encontrado.");
+        err.code = "NOT_FOUND";
         throw err;
     }
 
-    const query = `
-        UPDATE candidates 
-        SET name = ?, cpf = ?, phoneNumber = ?, curriculumId = ?
-        WHERE userId = ?
-    `;
+    const currentCpf = currentRows[0].cpf;
+    console.log("CPF atual no banco:", currentCpf);
 
-    const [result] = await conn.query(query, [
-        name,
-        cleanedCpf,
-        phoneNumber,
-        curriculumId ?? null,
-        userId,
-    ]);
+    let query;
+    let params;
+
+    // Se o CPF mudou, precisamos verificar se o novo CPF já existe para outro candidato
+    if (currentCpf !== cleanedCpf) {
+        const [duplicateRows] = await conn.query(
+            `SELECT userId FROM candidates WHERE cpf = ? AND userId != ?`,
+            [cleanedCpf, userId]
+        );
+
+        console.log(
+            "Resultado da verificação de CPF duplicado:",
+            duplicateRows
+        );
+
+        if (duplicateRows.length > 0) {
+            const err = new Error("CPF já cadastrado para outro candidato.");
+            err.code = "DUPLICATE_CPF";
+            throw err;
+        }
+
+        // Atualiza name, phoneNumber e cpf
+        query = `
+            UPDATE candidates 
+            SET name = ?, phoneNumber = ?, cpf = ?
+            WHERE userId = ?
+        `;
+        params = [name, phoneNumber, cleanedCpf, userId];
+    } else {
+        // Atualiza apenas name e phoneNumber
+        query = `
+            UPDATE candidates 
+            SET name = ?, phoneNumber = ?
+            WHERE userId = ?
+        `;
+        params = [name, phoneNumber, userId];
+    }
+
+    const [result] = await conn.query(query, params);
 
     return result.affectedRows
-        ? { userId, name, cpf: cleanedCpf, phoneNumber, curriculumId }
+        ? { userId, name, cpf: cleanedCpf, phoneNumber }
         : null;
 };
 
