@@ -147,13 +147,14 @@ const deleteCompanyData = async (userId) => {
             }
 
             // candidaturas associadas às vagas
-            await conn.query("DELETE FROM application WHERE vacancyId IN (?)", [
-                vacancyIds,
-            ]);
+            await conn.query(
+                "DELETE FROM applications WHERE vacancyId IN (?)",
+                [vacancyIds]
+            );
 
             // vagas da empresa
             await conn.query(
-                "DELETE FROM vacancy WHERE companyId IN (SELECT id FROM companies WHERE userId = ?)",
+                "DELETE FROM vacancies WHERE companyId IN (SELECT id FROM companies WHERE userId = ?)",
                 [userId]
             );
         }

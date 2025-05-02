@@ -274,7 +274,7 @@ router.put("/candidate/:userId", candidateController.updateCandidate);
 router.delete("/candidate/:id", candidateController.deleteCandidate);
 router.put("/candidate/:id/curriculum", candidateController.addCurriculum);
 router.delete(
-    "/candidateData/:candidateId/:curriculumId",
+    "/candidateData/:userId/:curriculumId",
     candidateController.deleteCandidateData
 );
 

@@ -156,7 +156,7 @@ const addCurriculum = async (id, curriculumId) => {
 const deleteCandidateData = async (userId, curriculumId) => {
     const conn = await connect();
     try {
-        await conn.query("DELETE FROM application WHERE userId = ?", [userId]);
+        await conn.query("DELETE FROM applications WHERE userId = ?", [userId]);
         await conn.query("DELETE FROM academicData WHERE curriculumId = ?", [
             curriculumId,
         ]);
@@ -166,7 +166,9 @@ const deleteCandidateData = async (userId, curriculumId) => {
         await conn.query("DELETE FROM coursesData WHERE curriculumId = ?", [
             curriculumId,
         ]);
-        await conn.query("DELETE FROM curriculum WHERE id = ?", [curriculumId]);
+        await conn.query("DELETE FROM curriculums WHERE id = ?", [
+            curriculumId,
+        ]);
 
         await conn.query(
             "UPDATE candidates SET curriculumId = NULL WHERE userId = ?",
