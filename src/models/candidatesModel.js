@@ -156,7 +156,10 @@ const addCurriculum = async (id, curriculumId) => {
 const deleteCandidateData = async (userId, curriculumId) => {
     const conn = await connect();
     try {
+        // 1. Remover candidaturas
         await conn.query("DELETE FROM applications WHERE userId = ?", [userId]);
+
+        // 2. Remover dados vinculados ao currículo
         await conn.query("DELETE FROM academicData WHERE curriculumId = ?", [
             curriculumId,
         ]);
@@ -166,14 +169,24 @@ const deleteCandidateData = async (userId, curriculumId) => {
         await conn.query("DELETE FROM coursesData WHERE curriculumId = ?", [
             curriculumId,
         ]);
+
+        // 3. Remover o currículo
         await conn.query("DELETE FROM curriculums WHERE id = ?", [
             curriculumId,
         ]);
 
+        // 4. Atualizar a tabela de candidatos (evita conflito de FK)
         await conn.query(
             "UPDATE candidates SET curriculumId = NULL WHERE userId = ?",
             [userId]
         );
+
+        // 5. Remover o candidato
+        await conn.query("DELETE FROM candidates WHERE userId = ?", [userId]);
+
+        // 6. Remover o usuário
+        await conn.query("DELETE FROM users WHERE id = ?", [userId]);
+
         return { message: "Dados excluídos com sucesso." };
     } catch (error) {
         console.error("Erro ao excluir dados:", error);
