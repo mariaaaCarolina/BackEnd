@@ -118,49 +118,54 @@ const deleteCompany = async (userId) => {
 const deleteCompanyData = async (userId) => {
     const conn = await connect();
     try {
-        // todos `vacancyId` relacionados
         const [vacancies] = await conn.query(
             "SELECT id FROM vacancies WHERE companyId IN (SELECT id FROM companies WHERE userId = ?)",
             [userId]
         );
-        const vacancyIds = vacancies.map((vacancy) => vacancy.id);
+        const vacancyIds = vacancies.map((v) => v.id);
 
         if (vacancyIds.length > 0) {
-            // todas as `questionId` associadas às vagas da empresa
             const [questions] = await conn.query(
-                "SELECT id FROM questions WHERE vacancyId IN (?)",
-                [vacancyIds]
+                `SELECT id FROM questions WHERE vacancyId IN (${vacancyIds
+                    .map(() => "?")
+                    .join(",")})`,
+                vacancyIds
             );
-            const questionIds = questions.map((question) => question.id);
+            const questionIds = questions.map((q) => q.id);
 
             if (questionIds.length > 0) {
-                // respostas associadas às perguntas
                 await conn.query(
-                    "DELETE FROM answers WHERE questionId IN (?)",
-                    [questionIds]
+                    `DELETE FROM answers WHERE questionId IN (${questionIds
+                        .map(() => "?")
+                        .join(",")})`,
+                    questionIds
                 );
-
-                // perguntas associadas às vagas
-                await conn.query("DELETE FROM questions WHERE id IN (?)", [
-                    questionIds,
-                ]);
+                await conn.query(
+                    `DELETE FROM questions WHERE id IN (${questionIds
+                        .map(() => "?")
+                        .join(",")})`,
+                    questionIds
+                );
             }
 
-            // candidaturas associadas às vagas
             await conn.query(
-                "DELETE FROM applications WHERE vacancyId IN (?)",
-                [vacancyIds]
+                `DELETE FROM applications WHERE vacancyId IN (${vacancyIds
+                    .map(() => "?")
+                    .join(",")})`,
+                vacancyIds
             );
 
-            // vagas da empresa
             await conn.query(
-                "DELETE FROM vacancies WHERE companyId IN (SELECT id FROM companies WHERE userId = ?)",
-                [userId]
+                `DELETE FROM vacancies WHERE id IN (${vacancyIds
+                    .map(() => "?")
+                    .join(",")})`,
+                vacancyIds
             );
         }
-
-        // empresa
         await conn.query("DELETE FROM companies WHERE userId = ?", [userId]);
+
+        // Agora é seguro deletar o usuário
+        await conn.query("DELETE FROM users WHERE id = ?", [userId]);
 
         return { message: "Dados excluídos com sucesso." };
     } catch (error) {
