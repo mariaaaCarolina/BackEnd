@@ -120,7 +120,7 @@ const deleteCompanyData = async (userId) => {
     try {
         // todos `vacancyId` relacionados
         const [vacancies] = await conn.query(
-            "SELECT id FROM vacancy WHERE companyId IN (SELECT id FROM companies WHERE userId = ?)",
+            "SELECT id FROM vacancies WHERE companyId IN (SELECT id FROM companies WHERE userId = ?)",
             [userId]
         );
         const vacancyIds = vacancies.map((vacancy) => vacancy.id);

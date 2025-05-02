@@ -551,7 +551,7 @@ router.get("/companies/:userId", companyController.getCompanyById);
 router.post("/companies", companyController.createCompany);
 router.put("/companies/:userId", companyController.updateCompany);
 router.delete("/companies/:id", companyController.deleteCompany);
-router.delete("/company/:id", companyController.deleteCompanyData);
+router.delete("/company/:userId", companyController.deleteCompanyData);
 
 /**
  * @swagger
