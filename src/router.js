@@ -271,7 +271,7 @@ router.get("/candidate/:userId", candidateController.getCandidateByUserId);
 router.get("/candidateid/:id", candidateController.getCandidateById);
 router.post("/candidate", candidateController.createCandidate);
 router.put("/candidate/:userId", candidateController.updateCandidate);
-router.delete("/candidate/:id", candidateController.deleteCandidate);
+router.delete("/candidate/:userId", candidateController.deleteCandidate);
 router.put("/candidate/:id/curriculum", candidateController.addCurriculum);
 router.delete(
     "/candidateData/:userId/:curriculumId",
