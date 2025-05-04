@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 const userController = require("./controllers/userController");
 // const auth = require("./auth");
 const companyController = require("./controllers/companyController");
@@ -14,7 +15,10 @@ const messagesController = require("./controllers/messagesController");
 const cancelledApplicationController = require("./controllers/cancelledApplicationController");
 // const forgotPasswordController = require("./controllers/forgotPassword");
 const candidateController = require("./controllers/candidatesController");
-const router = express.Router();
+const optionsController = require("./controllers/optionsController");
+const testsController = require("./controllers/testsController");
+const questionsTestController = require("./controllers/questionsTestController");
+const userTestResultsController = require("./controllers/userTestResultsController");
 require("dotenv").config();
 
 /**
@@ -3275,5 +3279,38 @@ router.get("/user/:id", userController.getUserById);
 router.post("/user", userController.createUser);
 router.put("/user/:id", userController.updateUser);
 router.delete("/user/:id", userController.deleteUser);
+
+router.get("/tests", testsController.getAll);
+router.get("/test/:id", testsController.getById);
+router.post("/test", testsController.createTest);
+router.put("/test/:id", testsController.updateTest);
+router.delete("/test/:id", testsController.deleteTest);
+
+router.get("/questions-test", questionsTestController.getAll);
+router.get("/question-test/:id", questionsTestController.getById);
+router.post("/question-test", questionsTestController.createQuestionTest);
+router.put("/question-test/:id", questionsTestController.updateQuestionTest);
+router.delete("/question-test/:id", questionsTestController.deleteQuestionTest);
+
+router.get("/options", optionsController.getAll);
+router.get("/option/:id", optionsController.getById);
+router.post("/option", optionsController.createOption);
+router.put("/option/:id", optionsController.updateOption);
+router.delete("/option/:id", optionsController.deleteOption);
+
+router.get("/user-test-results", userTestResultsController.getAll);
+router.get("/user-test-results/:id", userTestResultsController.getById);
+router.post(
+    "/user-test-results",
+    userTestResultsController.createUserTestResult
+);
+router.put(
+    "/user-test-results/:id",
+    userTestResultsController.updateUserTestResult
+);
+router.delete(
+    "/user-test-results/:id",
+    userTestResultsController.deleteUserTestResult
+);
 
 module.exports = router;
