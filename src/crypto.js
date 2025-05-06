@@ -3,7 +3,6 @@ const crypto = require("crypto");
 const algorithm = "aes-256-gcm";
 const key = Buffer.from(process.env.SECRET_KEY, "utf-8");
 
-// Verifique o comprimento da chave: deve ser 32 bytes para aes-256
 if (key.length !== 32) {
     console.log("KEY LENGTH:", key.length);
     console.log("KEY VALUE:", process.env.SECRET_KEY); // apenas para debug, remova depois
