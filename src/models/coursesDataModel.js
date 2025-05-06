@@ -1,9 +1,19 @@
 const connect = require("../connection");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     const conn = await connect();
     const query = await conn.query("SELECT * FROM coursesData");
-    return query[0];
+
+    const courses = query[0].map((course) => ({
+        ...course,
+        name: decrypt(course.name),
+        modality: decrypt(course.modality),
+        duration: decrypt(course.duration),
+        institutionName: decrypt(course.institutionName),
+    }));
+
+    return courses;
 };
 
 const getById = async (id) => {
@@ -12,7 +22,16 @@ const getById = async (id) => {
         "SELECT * FROM coursesData WHERE curriculumId = ?",
         [id]
     );
-    return query[0];
+
+    const courses = query[0].map((course) => ({
+        ...course,
+        name: decrypt(course.name),
+        modality: decrypt(course.modality),
+        duration: decrypt(course.duration),
+        institutionName: decrypt(course.institutionName),
+    }));
+
+    return courses;
 };
 
 const createCourseData = async (courseData) => {
@@ -28,17 +47,22 @@ const createCourseData = async (courseData) => {
             curriculumId,
         } = courseData;
 
+        const encryptedData = {
+            name: encrypt(name),
+            modality: encrypt(modality),
+            duration: encrypt(duration),
+            institutionName: encrypt(institutionName),
+        };
+
         const [result] = await conn.query(
-            `INSERT INTO coursesData (name, modality, duration, endDate, isCurrentlyStudying, 
-            institutionName, curriculumId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?);`,
+            "INSERT INTO coursesData (name, modality, duration, endDate, isCurrentlyStudying, institutionName, curriculumId) VALUES (?, ?, ?, ?, ?, ?, ?);",
             [
-                name,
-                modality,
-                duration,
+                encryptedData.name,
+                encryptedData.modality,
+                encryptedData.duration,
                 endDate,
                 isCurrentlyStudying,
-                institutionName,
+                encryptedData.institutionName,
                 curriculumId,
             ]
         );
@@ -63,20 +87,27 @@ const updateCourseData = async (id, courseData) => {
             curriculumId,
         } = courseData;
 
+        const encryptedData = {
+            name: encrypt(name),
+            modality: encrypt(modality),
+            duration: encrypt(duration),
+            institutionName: encrypt(institutionName),
+        };
+
         const [result] = await conn.query(
-            `UPDATE coursesData SET name = ?, modality = ?, duration = ?, endDate = ?, 
-            isCurrentlyStudying = ?, institutionName = ?, curriculumId = ? WHERE id = ?;`,
+            "UPDATE coursesData SET name = ?, modality = ?, duration = ?, endDate = ?, isCurrentlyStudying = ?, institutionName = ?, curriculumId = ? WHERE id = ?;",
             [
-                name,
-                modality,
-                duration,
+                encryptedData.name,
+                encryptedData.modality,
+                encryptedData.duration,
                 endDate,
                 isCurrentlyStudying,
-                institutionName,
+                encryptedData.institutionName,
                 curriculumId,
                 id,
             ]
         );
+
         if (result.affectedRows === 0) {
             throw new Error(`Curso com ID ${id} não encontrado.`);
         }
@@ -92,9 +123,10 @@ const deleteCourseData = async (id) => {
     const conn = await connect();
     try {
         const [result] = await conn.query(
-            `DELETE FROM coursesData WHERE id = ?;`,
+            "DELETE FROM coursesData WHERE id = ?;",
             [id]
         );
+
         if (result.affectedRows === 0) {
             throw new Error(`Curso com ID ${id} não encontrado.`);
         }

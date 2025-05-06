@@ -1,9 +1,17 @@
 const connect = require("../connection");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     const conn = await connect();
     const query = await conn.query("SELECT * FROM academicData");
-    return query[0];
+
+    const academicData = query[0].map((data) => ({
+        ...data,
+        institutionName: decrypt(data.institutionName),
+        city: decrypt(data.city),
+    }));
+
+    return academicData;
 };
 
 const getById = async (id) => {
@@ -12,7 +20,15 @@ const getById = async (id) => {
         "SELECT * FROM academicData WHERE curriculumId = ?",
         [id]
     );
-    return query[0];
+
+    if (query[0].length > 0) {
+        const data = query[0][0];
+        data.institutionName = decrypt(data.institutionName);
+        data.city = decrypt(data.city);
+        return data;
+    }
+
+    return null;
 };
 
 const createAcademicData = async (academicData) => {
@@ -27,8 +43,11 @@ const createAcademicData = async (academicData) => {
             institutionName,
             degree,
             city,
-            curriculumId, // referenciar o currículo associado
+            curriculumId,
         } = academicData;
+
+        const encryptedInstitutionName = encrypt(institutionName);
+        const encryptedCity = encrypt(city);
 
         const [result] = await conn.query(
             `INSERT INTO academicData (name, semester, startDate, endDate, isCurrentlyStudying, 
@@ -40,9 +59,9 @@ const createAcademicData = async (academicData) => {
                 startDate,
                 endDate,
                 isCurrentlyStudying,
-                institutionName,
+                encryptedInstitutionName,
                 degree,
-                city,
+                encryptedCity,
                 curriculumId,
             ]
         );
@@ -69,6 +88,9 @@ const updateAcademicData = async (id, academicData) => {
             curriculumId,
         } = academicData;
 
+        const encryptedInstitutionName = encrypt(institutionName);
+        const encryptedCity = encrypt(city);
+
         const [result] = await conn.query(
             `UPDATE academicData 
             SET name = ?, semester = ?, startDate = ?, endDate = ?, isCurrentlyStudying = ?, 
@@ -80,9 +102,9 @@ const updateAcademicData = async (id, academicData) => {
                 startDate,
                 endDate,
                 isCurrentlyStudying,
-                institutionName,
+                encryptedInstitutionName,
                 degree,
-                city,
+                encryptedCity,
                 curriculumId,
                 id,
             ]
@@ -110,15 +132,15 @@ const deleteAcademicData = async (id) => {
             [id]
         );
         if (result.affectedRows === 0) {
-            throw new Error(`Dado academico com ID ${id} não encontrado.`);
+            throw new Error(`Dado acadêmico com ID ${id} não encontrado.`);
         }
 
         return {
-            message: `Dado academico com ID ${id} foi removido com sucesso.`,
+            message: `Dado acadêmico com ID ${id} foi removido com sucesso.`,
         };
     } catch (error) {
-        console.error("Erro ao deletar o dado academico:", error.message);
-        throw new Error("Erro ao deletar o dado academico.");
+        console.error("Erro ao deletar o dado acadêmico:", error.message);
+        throw new Error("Erro ao deletar o dado acadêmico.");
     }
 };
 

@@ -1,9 +1,25 @@
 const connect = require("../connection");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     const conn = await connect();
     const query = await conn.query("SELECT * FROM vacancies");
-    return query[0];
+
+    return query[0].map((row) => ({
+        ...row,
+        title: decrypt(row.title),
+        description: decrypt(row.description),
+        aboutCompany: decrypt(row.aboutCompany),
+        benefits: decrypt(row.benefits),
+        requirements: decrypt(row.requirements),
+        modality: decrypt(row.modality),
+        locality: decrypt(row.locality),
+        uf: decrypt(row.uf),
+        contact: decrypt(row.contact),
+        salary: decrypt(row.salary),
+        level: decrypt(row.level),
+        companyName: decrypt(row.companyName),
+    }));
 };
 
 const getById = async (id) => {
@@ -11,7 +27,24 @@ const getById = async (id) => {
     const query = await conn.query(`SELECT * FROM vacancies WHERE id = ?`, [
         id,
     ]);
-    return query[0][0];
+    const vacancy = query[0][0];
+
+    if (vacancy) {
+        vacancy.title = decrypt(vacancy.title);
+        vacancy.description = decrypt(vacancy.description);
+        vacancy.aboutCompany = decrypt(vacancy.aboutCompany);
+        vacancy.benefits = decrypt(vacancy.benefits);
+        vacancy.requirements = decrypt(vacancy.requirements);
+        vacancy.modality = decrypt(vacancy.modality);
+        vacancy.locality = decrypt(vacancy.locality);
+        vacancy.uf = decrypt(vacancy.uf);
+        vacancy.contact = decrypt(vacancy.contact);
+        vacancy.salary = decrypt(vacancy.salary);
+        vacancy.level = decrypt(vacancy.level);
+        vacancy.companyName = decrypt(vacancy.companyName);
+    }
+
+    return vacancy;
 };
 
 const createVacancy = async (vacancy) => {
@@ -33,28 +66,38 @@ const createVacancy = async (vacancy) => {
             companyName,
         } = vacancy;
 
-        // Verifique o número de parâmetros e colunas
+        const encryptedTitle = encrypt(title);
+        const encryptedDescription = encrypt(description);
+        const encryptedAboutCompany = encrypt(aboutCompany);
+        const encryptedBenefits = encrypt(benefits);
+        const encryptedRequirements = encrypt(requirements);
+        const encryptedModality = encrypt(modality);
+        const encryptedLocality = encrypt(locality);
+        const encryptedUf = encrypt(uf);
+        const encryptedContact = encrypt(contact);
+        const encryptedSalary = encrypt(salary.toString());
+        const encryptedLevel = encrypt(level);
+        const encryptedCompanyName = encrypt(companyName);
+
         const query = `INSERT INTO vacancies (title, description, aboutCompany, benefits, 
             requirements, modality, locality, uf, contact, salary, level, companyId, companyName) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
         const values = [
-            title,
-            description,
-            aboutCompany,
-            benefits,
-            requirements,
-            modality,
-            locality,
-            uf,
-            contact,
-            salary,
-            level,
+            encryptedTitle,
+            encryptedDescription,
+            encryptedAboutCompany,
+            encryptedBenefits,
+            encryptedRequirements,
+            encryptedModality,
+            encryptedLocality,
+            encryptedUf,
+            encryptedContact,
+            encryptedSalary,
+            encryptedLevel,
             companyId,
-            companyName,
+            encryptedCompanyName,
         ];
-
-        console.log("Valores sendo inseridos:", values); // Debugging
 
         const [result] = await conn.query(query, values);
 
@@ -83,6 +126,20 @@ const updateVacancy = async (id, vacancyData) => {
             companyId,
             companyName,
         } = vacancyData;
+
+        const encryptedTitle = encrypt(title);
+        const encryptedDescription = encrypt(description);
+        const encryptedAboutCompany = encrypt(aboutCompany);
+        const encryptedBenefits = encrypt(benefits);
+        const encryptedRequirements = encrypt(requirements);
+        const encryptedModality = encrypt(modality);
+        const encryptedLocality = encrypt(locality);
+        const encryptedUf = encrypt(uf);
+        const encryptedContact = encrypt(contact);
+        const encryptedSalary = encrypt(salary.toString());
+        const encryptedLevel = encrypt(level);
+        const encryptedCompanyName = encrypt(companyName);
+
         const [result] = await conn.query(
             `UPDATE vacancies SET 
                 title = ?, 
@@ -100,19 +157,19 @@ const updateVacancy = async (id, vacancyData) => {
                 companyName = ?
             WHERE id = ?;`,
             [
-                title,
-                description,
-                aboutCompany,
-                benefits,
-                requirements,
-                modality,
-                locality,
-                uf,
-                contact,
-                salary,
-                level,
+                encryptedTitle,
+                encryptedDescription,
+                encryptedAboutCompany,
+                encryptedBenefits,
+                encryptedRequirements,
+                encryptedModality,
+                encryptedLocality,
+                encryptedUf,
+                encryptedContact,
+                encryptedSalary,
+                encryptedLevel,
                 companyId,
-                companyName,
+                encryptedCompanyName,
                 id,
             ]
         );

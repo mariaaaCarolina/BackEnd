@@ -1,15 +1,18 @@
-//teste
 const connect = require("../connection");
 const bcrypt = require("bcrypt");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     try {
         const conn = await connect();
-        const [rows] = await conn.query(`
-            SELECT id, email, password, type 
-            FROM users
-        `);
-        return rows;
+        const [rows] = await conn.query(
+            `SELECT id, email, password, type FROM users`
+        );
+        const users = rows.map((user) => ({
+            ...user,
+            email: decrypt(user.email),
+        }));
+        return users;
     } catch (error) {
         console.error("Database error: ", error);
         throw new Error("Could not retrieve users");
@@ -18,8 +21,13 @@ const getAll = async () => {
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM users WHERE id = ?", [id]);
-    return query[0][0]; // Retorna um único usuário
+    const [[user]] = await conn.query("SELECT * FROM users WHERE id = ?", [id]);
+
+    if (user) {
+        user.email = decrypt(user.email);
+    }
+
+    return user;
 };
 
 const createUser = async (user) => {
@@ -27,10 +35,15 @@ const createUser = async (user) => {
     try {
         const { email, password, type } = user;
 
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const encryptedEmail = encrypt(email);
+
         const [result] = await conn.query(
             `INSERT INTO users (email, password, type) VALUES (?, ?, ?);`,
-            [email, password, type]
+            [encryptedEmail, hashedPassword, type]
         );
+        console.log("EMAIL ORIGINAL:", email);
+        console.log("EMAIL ENCRYPTED:", encryptedEmail);
         return { id: result.insertId, email, type };
     } catch (error) {
         console.error("Erro ao criar usuário: ", error.message);
@@ -43,13 +56,21 @@ const updateUser = async (id, user) => {
     try {
         const { email, password, type } = user;
 
+        const encryptedEmail = encrypt(email);
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const query = `
             UPDATE users 
             SET email = ?, password = ?, type = ?
             WHERE id = ?
         `;
 
-        const [result] = await conn.query(query, [email, password, type, id]);
+        const [result] = await conn.query(query, [
+            encryptedEmail,
+            hashedPassword,
+            type,
+            id,
+        ]);
 
         return result.affectedRows ? { id, email, type } : null;
     } catch (error) {

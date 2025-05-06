@@ -1,9 +1,42 @@
 const connect = require("../connection");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
+    try {
+        const conn = await connect();
+        const [rows] = await conn.query("SELECT * FROM companies");
+
+        const companies = rows.map((company) => ({
+            ...company,
+            name: decrypt(company.name),
+            cnpj: decrypt(company.cnpj),
+            address: decrypt(company.address),
+            phoneNumber: decrypt(company.phoneNumber),
+            url: decrypt(company.url),
+        }));
+        return companies;
+    } catch (error) {
+        console.error("Database error: ", error);
+        throw new Error("Could not retrieve companies");
+    }
+};
+
+const getById = async (userId) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM companies");
-    return query[0];
+    const [[company]] = await conn.query(
+        "SELECT * FROM companies WHERE userId = ?",
+        [userId]
+    );
+
+    if (company) {
+        company.name = decrypt(company.name);
+        company.cnpj = decrypt(company.cnpj);
+        company.address = decrypt(company.address);
+        company.phoneNumber = decrypt(company.phoneNumber);
+        company.url = decrypt(company.url);
+    }
+
+    return company;
 };
 
 const createCompany = async (company) => {
@@ -25,21 +58,27 @@ const createCompany = async (company) => {
             userId,
         } = company;
 
+        const encryptedName = encrypt(name);
+        const encryptedCnpj = encrypt(cnpj);
+        const encryptedAddress = encrypt(address);
+        const encryptedPhoneNumber = encrypt(phoneNumber);
+        const encryptedUrl = encrypt(url);
+
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, phoneNumber, city, cep, address, addressNumber, uf, url, logo, userId) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                name,
-                cnpj,
+                encryptedName,
+                encryptedCnpj,
                 segment,
                 responsible,
-                phoneNumber,
+                encryptedPhoneNumber,
                 city,
                 cep,
-                address,
+                encryptedAddress,
                 addressNumber,
                 uf,
-                url,
+                encryptedUrl,
                 logo,
                 userId,
             ]
@@ -49,16 +88,6 @@ const createCompany = async (company) => {
         console.error("Erro ao criar a empresa:", error.message);
         throw new Error("Erro ao criar a empresa");
     }
-};
-
-const getById = async (userId) => {
-    const conn = await connect();
-    const [rows] = await conn.query(
-        "SELECT * FROM companies WHERE userId = ?",
-        [userId]
-    );
-    if (rows.length === 0) throw new Error("Empresa não encontrada.");
-    return rows[0];
 };
 
 const updateCompany = async (userId, company) => {
@@ -78,6 +107,12 @@ const updateCompany = async (userId, company) => {
         logo,
     } = company;
 
+    const encryptedName = encrypt(name);
+    const encryptedCnpj = encrypt(cnpj);
+    const encryptedAddress = encrypt(address);
+    const encryptedPhoneNumber = encrypt(phoneNumber);
+    const encryptedUrl = encrypt(url);
+
     const query = `
         UPDATE companies 
         SET name = ?, cnpj = ?, segment = ?, responsible = ?, 
@@ -87,17 +122,17 @@ const updateCompany = async (userId, company) => {
     `;
 
     const [result] = await conn.query(query, [
-        name,
-        cnpj,
+        encryptedName,
+        encryptedCnpj,
         segment,
         responsible,
-        phoneNumber,
+        encryptedPhoneNumber,
         city,
         cep,
-        address,
+        encryptedAddress,
         addressNumber,
         uf,
-        url,
+        encryptedUrl,
         logo,
         userId,
     ]);
@@ -164,7 +199,6 @@ const deleteCompanyData = async (userId) => {
         }
         await conn.query("DELETE FROM companies WHERE userId = ?", [userId]);
 
-        // Agora é seguro deletar o usuário
         await conn.query("DELETE FROM users WHERE id = ?", [userId]);
 
         return { message: "Dados excluídos com sucesso." };

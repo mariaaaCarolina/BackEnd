@@ -5,6 +5,8 @@ const app = express();
 const swagger = require("./swagger");
 swagger(app);
 
+require("dotenv").config();
+
 app.use(express.json());
 app.use(cors());
 app.use(router);

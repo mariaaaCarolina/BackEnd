@@ -1,10 +1,17 @@
 const connect = require("../connection");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     const conn = await connect();
     try {
         const query = await conn.query("SELECT * FROM competences");
-        return query[0];
+
+        const competences = query[0].map((competence) => ({
+            ...competence,
+            name: decrypt(competence.name),
+        }));
+
+        return competences;
     } catch (error) {
         console.error("Erro ao buscar competências:", error.message);
         throw new Error("Erro ao buscar competências.");
@@ -17,7 +24,13 @@ const getById = async (id) => {
         "SELECT * FROM competences WHERE curriculumId = ?",
         [id]
     );
-    return query[0];
+
+    const competence = query[0][0];
+    if (competence) {
+        competence.name = decrypt(competence.name);
+    }
+
+    return competence;
 };
 
 const createCompetence = async (competenceData) => {
@@ -25,10 +38,12 @@ const createCompetence = async (competenceData) => {
     try {
         const { name, curriculumId } = competenceData;
 
+        const encryptedName = encrypt(name);
+
         const [result] = await conn.query(
             `INSERT INTO competences (name, curriculumId) 
             VALUES (?, ?);`,
-            [name, curriculumId]
+            [encryptedName, curriculumId]
         );
         console.log("Competence Data:", competenceData);
         return { id: result.insertId, ...competenceData };
@@ -43,18 +58,20 @@ const updateCompetence = async (id, competences) => {
     try {
         const { name, curriculumId } = competences;
 
+        const encryptedName = encrypt(name);
+
         const [result] = await conn.query(
             "UPDATE competences SET name = ?, curriculumId = ? WHERE id = ?;",
-            [name, curriculumId, id]
+            [encryptedName, curriculumId, id]
         );
         if (result.affectedRows === 0) {
-            throw new Error(`Competencia com ID ${id} não encontrado.`);
+            throw new Error(`Competência com ID ${id} não encontrada.`);
         }
 
         return { id, ...competences };
     } catch (error) {
-        console.error("Erro ao atualizar dados da competencia:", error.message);
-        throw new Error("Erro ao atualizar dados da competencia.");
+        console.error("Erro ao atualizar dados da competência:", error.message);
+        throw new Error("Erro ao atualizar dados da competência.");
     }
 };
 
@@ -66,13 +83,13 @@ const deleteCompetence = async (id) => {
             [id]
         );
         if (result.affectedRows === 0) {
-            throw new Error(`Competencia com ID ${id} não encontrado.`);
+            throw new Error(`Competência com ID ${id} não encontrada.`);
         }
 
-        return { message: `Competencia com ID ${id} deletado com sucesso.` };
+        return { message: `Competência com ID ${id} deletada com sucesso.` };
     } catch (error) {
-        console.error("Erro ao deletar dados da competencia:", error.message);
-        throw new Error("Erro ao deletar dados da competencia.");
+        console.error("Erro ao deletar dados da competência:", error.message);
+        throw new Error("Erro ao deletar dados da competência.");
     }
 };
 

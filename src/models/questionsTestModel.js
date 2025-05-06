@@ -1,9 +1,16 @@
 const connect = require("../connection");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     const conn = await connect();
     const [rows] = await conn.query("SELECT * FROM questions_test");
-    return rows;
+
+    const decryptedRows = rows.map((row) => ({
+        ...row,
+        question_text: decrypt(row.question_text),
+    }));
+
+    return decryptedRows;
 };
 
 const getById = async (id) => {
@@ -12,17 +19,30 @@ const getById = async (id) => {
         "SELECT * FROM questions_test WHERE id = ?",
         [id]
     );
+
+    if (rows[0]) {
+        rows[0].question_text = decrypt(rows[0].question_text);
+    }
+
     return rows[0];
 };
 
 const createQuestionTest = async (questionData) => {
     const conn = await connect();
-    const { testId, question } = questionData;
+    const testId = questionData.test_id || questionData.testId;
+    const question = questionData.question_text || questionData.question;
+
+    if (!question || typeof question !== "string") {
+        throw new Error(
+            "Campo 'question' é obrigatório e deve ser uma string."
+        );
+    }
+
     const [result] = await conn.query(
         "INSERT INTO questions_test (test_id, question_text) VALUES (?, ?)",
-        [testId, question]
+        [testId, encrypt(question)]
     );
-    return { id: result.insertId, ...questionData };
+    return { id: result.insertId, testId, question };
 };
 
 const updateQuestionTest = async (id, questionData) => {
@@ -30,7 +50,7 @@ const updateQuestionTest = async (id, questionData) => {
     const { test_id, question_text } = questionData;
     const [result] = await conn.query(
         "UPDATE questions_test SET test_id = ?, question_text = ? WHERE id = ?",
-        [test_id, question_text, id]
+        [test_id, encrypt(question_text), id]
     );
     if (result.affectedRows === 0)
         throw new Error(`Questão com ID ${id} não encontrada.`);

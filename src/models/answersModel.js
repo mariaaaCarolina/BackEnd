@@ -1,17 +1,29 @@
 const connect = require("../connection");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     const conn = await connect();
-
     const query = await conn.query("SELECT * FROM answers");
 
-    return query[0];
+    const answers = query[0].map((data) => ({
+        ...data,
+        answer: decrypt(data.answer),
+    }));
+
+    return answers;
 };
 
 const getById = async (id) => {
     const conn = await connect();
     const query = await conn.query("SELECT * FROM answers WHERE id = ?", [id]);
-    return query[0][0];
+
+    if (query[0].length > 0) {
+        const data = query[0][0];
+        data.answer = decrypt(data.answer);
+        return data;
+    }
+
+    return null;
 };
 
 const getAllByQuestionId = async (questionId) => {
@@ -20,21 +32,36 @@ const getAllByQuestionId = async (questionId) => {
         "SELECT * FROM answers WHERE questionId = ?",
         [questionId]
     );
-    return query[0];
+
+    const answers = query[0].map((data) => ({
+        ...data,
+        answer: decrypt(data.answer),
+    }));
+
+    return answers;
 };
 
-const getCandidateIdById = async (id) => {
+const getCandidateIdById = async (userId) => {
     const conn = await connect();
     const [rows] = await conn.query(
-        "SELECT id FROM candidates WHERE id = ? LIMIT 1",
-        [id]
+        "SELECT id FROM candidates WHERE userId = ? LIMIT 1",
+        [userId]
     );
-    return rows.length > 0 ? rows[0].id : null;
+
+    if (rows.length === 0) {
+        console.error(`Candidato com userId ${userId} não encontrado.`);
+        return null;
+    }
+
+    console.log(`Candidato encontrado:`, rows[0]);
+    return rows[0].id;
 };
 
 const createAnswer = async (answerData) => {
     const conn = await connect();
     const { answer, questionId, userId } = answerData;
+
+    console.log("userId recebido:", userId);
 
     const candidateId = await getCandidateIdById(userId);
     if (!candidateId) {
@@ -44,16 +71,19 @@ const createAnswer = async (answerData) => {
     }
 
     try {
+        const encryptedAnswer = encrypt(answer);
+
         const [result] = await conn.query(
             `INSERT INTO answers (answer, questionId, userId) VALUES (?, ?, ?)`,
-            [answer, questionId, candidateId]
+            [encryptedAnswer, questionId, candidateId]
         );
-        console.log("Answer Data:", {
-            answer,
+
+        return {
+            id: result.insertId,
+            answer: encryptedAnswer,
             questionId,
             userId: candidateId,
-        });
-        return { id: result.insertId, answer, questionId, userId: candidateId };
+        };
     } catch (error) {
         console.error("Erro ao criar resposta:", error.message);
         throw new Error("Erro ao criar resposta.");
@@ -65,15 +95,18 @@ const updateAnswer = async (id, answers) => {
     try {
         const { answer, questionId, userId } = answers;
 
+        const encryptedAnswer = encrypt(answer);
+
         const [result] = await conn.query(
             `UPDATE answers SET answer = ?, questionId = ?, userId = ? WHERE id = ?;`,
-            [answer, questionId, userId, id]
+            [encryptedAnswer, questionId, userId, id]
         );
+
         if (result.affectedRows === 0) {
-            throw new Error(`Resposta com ID ${id} não encontrado.`);
+            throw new Error(`Resposta com ID ${id} não encontrada.`);
         }
 
-        return { id, ...answers };
+        return { id, answer: encryptedAnswer, questionId, userId };
     } catch (error) {
         console.error("Erro ao atualizar dados da resposta:", error.message);
         throw new Error("Erro ao atualizar dados da resposta.");

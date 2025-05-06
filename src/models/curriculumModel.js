@@ -1,17 +1,42 @@
 const connect = require("../connection");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM curriculums;");
-    return query[0];
+    const [rows] = await conn.query("SELECT * FROM curriculums;");
+
+    const decryptedRows = rows.map((curriculum) => ({
+        ...curriculum,
+        address: decrypt(curriculum.address),
+        description: decrypt(curriculum.description),
+        attached: decrypt(curriculum.attached),
+        schoolName: decrypt(curriculum.schoolName),
+        schoolCity: decrypt(curriculum.schoolCity),
+        interestArea: decrypt(curriculum.interestArea),
+        city: decrypt(curriculum.city),
+    }));
+
+    return decryptedRows;
 };
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM curriculums WHERE id = ?", [
-        id,
-    ]);
-    return query[0][0];
+    const [[curriculum]] = await conn.query(
+        "SELECT * FROM curriculums WHERE id = ?",
+        [id]
+    );
+
+    if (curriculum) {
+        curriculum.address = decrypt(curriculum.address);
+        curriculum.description = decrypt(curriculum.description);
+        curriculum.attached = decrypt(curriculum.attached);
+        curriculum.schoolName = decrypt(curriculum.schoolName);
+        curriculum.schoolCity = decrypt(curriculum.schoolCity);
+        curriculum.interestArea = decrypt(curriculum.interestArea);
+        curriculum.city = decrypt(curriculum.city);
+    }
+
+    return curriculum;
 };
 
 const createCurriculum = async (curriculum) => {
@@ -31,7 +56,9 @@ const createCurriculum = async (curriculum) => {
             description,
         } = curriculum;
 
-        const attached = curriculum.attached ? curriculum.attached : null;
+        const attached = curriculum.attached
+            ? encrypt(curriculum.attached)
+            : null;
 
         const [result] = await conn.query(
             `INSERT INTO curriculums (id, dateOfBirth, age, gender, race, city, 
@@ -44,10 +71,10 @@ const createCurriculum = async (curriculum) => {
                 age,
                 gender,
                 race,
-                city,
+                encrypt(city),
                 attached,
-                description,
-                address,
+                encrypt(description),
+                encrypt(address),
                 addressNumber,
                 cep,
                 uf,
@@ -87,8 +114,8 @@ const updateCurriculum = async (id, curriculum) => {
                 age,
                 gender,
                 race,
-                city,
-                address,
+                encrypt(city),
+                encrypt(address),
                 addressNumber,
                 cep,
                 uf,
@@ -157,9 +184,9 @@ const addSchoolData = async (userId, data) => {
         const [result] = await conn.query(
             "UPDATE curriculums SET schoolName = ?, schoolYear = ?, schoolCity = ?, schoolStartDate = ?, schoolEndDate = ?, isCurrentlyStudying = ? WHERE id = ?",
             [
-                schoolName,
+                encrypt(schoolName),
                 schoolYear,
-                schoolCity,
+                encrypt(schoolCity),
                 schoolStartDate,
                 schoolEndDate,
                 isCurrentlyStudying,
@@ -180,9 +207,9 @@ const addDataToCurriculum = async (userId, data) => {
     const query =
         "UPDATE curriculums SET description = ?, attached = ?, interestArea = ? WHERE id = ?";
     const [result] = await conn.query(query, [
-        description,
-        attached,
-        interestArea,
+        encrypt(description),
+        encrypt(attached),
+        encrypt(interestArea),
         userId,
     ]);
     return result;

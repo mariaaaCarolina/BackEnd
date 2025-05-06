@@ -1,10 +1,9 @@
 const connect = require("../connection");
-const bcrypt = require("bcrypt");
+const { encrypt, decrypt } = require("../crypto");
 
 const getAll = async () => {
     try {
         const conn = await connect();
-
         const [rows] = await conn.query(`
             SELECT 
                 candidates.id AS id, 
@@ -15,7 +14,15 @@ const getAll = async () => {
                 candidates.userId
             FROM candidates
         `);
-        return rows;
+
+        const candidates = rows.map((candidate) => ({
+            ...candidate,
+            name: decrypt(candidate.name),
+            cpf: decrypt(candidate.cpf),
+            phoneNumber: decrypt(candidate.phoneNumber),
+        }));
+
+        return candidates;
     } catch (error) {
         console.error("Database error: ", error);
         throw new Error("Could not retrieve candidates");
@@ -24,36 +31,59 @@ const getAll = async () => {
 
 const getByUserId = async (userId) => {
     const conn = await connect();
-    const query = await conn.query(
+    const [[candidate]] = await conn.query(
         "SELECT * FROM candidates WHERE userId = ?",
         [userId]
     );
-    console.log("Resultado da query:", query[0]);
-    return query[0][0];
+
+    if (candidate) {
+        candidate.name = decrypt(candidate.name);
+        candidate.cpf = decrypt(candidate.cpf);
+        candidate.phoneNumber = decrypt(candidate.phoneNumber);
+    }
+
+    return candidate;
 };
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query("SELECT * FROM candidates WHERE id = ?", [
-        id,
-    ]);
-    console.log("Resultado da query:", query[0]);
-    return query[0][0];
+    const [[candidate]] = await conn.query(
+        "SELECT * FROM candidates WHERE id = ?",
+        [id]
+    );
+
+    if (candidate) {
+        candidate.name = decrypt(candidate.name);
+        candidate.cpf = decrypt(candidate.cpf);
+        candidate.phoneNumber = decrypt(candidate.phoneNumber);
+    }
+
+    return candidate;
 };
 
-const createCandidate = async (candidates) => {
+const createCandidate = async (candidate) => {
     const conn = await connect();
     try {
-        const { name, cpf, phoneNumber, curriculumId, userId } = candidates;
+        const { name, cpf, phoneNumber, curriculumId, userId } = candidate;
+
+        const encryptedName = encrypt(name);
+        const encryptedCpf = encrypt(cpf);
+        const encryptedPhoneNumber = encrypt(phoneNumber);
 
         const [result] = await conn.query(
             `INSERT INTO candidates (name, cpf, phoneNumber, curriculumId, userId) 
             VALUES (?, ?, ?, ?, ?);`,
-            [name, cpf, phoneNumber, curriculumId || null, userId || null]
+            [
+                encryptedName,
+                encryptedCpf,
+                encryptedPhoneNumber,
+                curriculumId || null,
+                userId || null,
+            ]
         );
-        return { id: result.insertId, ...candidates };
+        return { id: result.insertId, ...candidate };
     } catch (error) {
-        console.error("Erro ao criar o candidato :", error.message);
+        console.error("Erro ao criar o candidato:", error.message);
         throw new Error("Erro ao criar o candidato");
     }
 };
@@ -61,146 +91,31 @@ const createCandidate = async (candidates) => {
 const updateCandidate = async (userId, candidate) => {
     const conn = await connect();
     const { name, cpf, phoneNumber } = candidate;
-    const cleanedCpf = cpf.trim();
 
-    console.log("Atualizando candidato com dados:", {
+    const encryptedName = encrypt(name);
+    const encryptedCpf = encrypt(cpf);
+    const encryptedPhoneNumber = encrypt(phoneNumber);
+
+    const query = `
+        UPDATE candidates 
+        SET name = ?, cpf = ?, phoneNumber = ?
+        WHERE userId = ?
+    `;
+
+    const [result] = await conn.query(query, [
+        encryptedName,
+        encryptedCpf,
+        encryptedPhoneNumber,
         userId,
-        name,
-        cpf: cleanedCpf,
-        phoneNumber,
-    });
+    ]);
 
-    // Primeiro, busca o CPF atual desse usuário
-    const [currentRows] = await conn.query(
-        `SELECT cpf FROM candidates WHERE userId = ?`,
-        [userId]
-    );
-
-    if (currentRows.length === 0) {
-        const err = new Error("Candidato não encontrado.");
-        err.code = "NOT_FOUND";
-        throw err;
-    }
-
-    const currentCpf = currentRows[0].cpf;
-    console.log("CPF atual no banco:", currentCpf);
-
-    let query;
-    let params;
-
-    // Se o CPF mudou, precisamos verificar se o novo CPF já existe para outro candidato
-    if (currentCpf !== cleanedCpf) {
-        const [duplicateRows] = await conn.query(
-            `SELECT userId FROM candidates WHERE cpf = ? AND userId != ?`,
-            [cleanedCpf, userId]
-        );
-
-        console.log(
-            "Resultado da verificação de CPF duplicado:",
-            duplicateRows
-        );
-
-        if (duplicateRows.length > 0) {
-            const err = new Error("CPF já cadastrado para outro candidato.");
-            err.code = "DUPLICATE_CPF";
-            throw err;
-        }
-
-        // Atualiza name, phoneNumber e cpf
-        query = `
-            UPDATE candidates 
-            SET name = ?, phoneNumber = ?, cpf = ?
-            WHERE userId = ?
-        `;
-        params = [name, phoneNumber, cleanedCpf, userId];
-    } else {
-        // Atualiza apenas name e phoneNumber
-        query = `
-            UPDATE candidates 
-            SET name = ?, phoneNumber = ?
-            WHERE userId = ?
-        `;
-        params = [name, phoneNumber, userId];
-    }
-
-    const [result] = await conn.query(query, params);
-
-    return result.affectedRows
-        ? { userId, name, cpf: cleanedCpf, phoneNumber }
-        : null;
-};
-
-const deleteCandidate = async (userId) => {
-    const conn = await connect();
-    try {
-        await conn.query("DELETE FROM messages WHERE sender_id = ?", [userId]);
-        const [result] = await conn.query(
-            "DELETE FROM candidates WHERE userId = ?",
-            [userId]
-        );
-
-        return result;
-    } catch (error) {
-        console.error("Erro ao excluir candidato e suas mensagens:", error);
-        throw new Error("Erro ao excluir candidato e suas mensagens");
-    }
-};
-
-const addCurriculum = async (id, curriculumId) => {
-    const conn = await connect();
-    const query = "UPDATE candidates SET curriculumId = ? WHERE id = ?";
-    const [result] = await conn.query(query, [curriculumId, id]);
-    return result;
-};
-
-const deleteCandidateData = async (userId, curriculumId) => {
-    const conn = await connect();
-    try {
-        // 1. Remover candidaturas
-        await conn.query("DELETE FROM applications WHERE userId = ?", [userId]);
-
-        // 2. Remover dados vinculados ao currículo
-        await conn.query("DELETE FROM academicData WHERE curriculumId = ?", [
-            curriculumId,
-        ]);
-        await conn.query("DELETE FROM competences WHERE curriculumId = ?", [
-            curriculumId,
-        ]);
-        await conn.query("DELETE FROM coursesData WHERE curriculumId = ?", [
-            curriculumId,
-        ]);
-
-        // 3. Remover o currículo
-        await conn.query("DELETE FROM curriculums WHERE id = ?", [
-            curriculumId,
-        ]);
-
-        // 4. Atualizar a tabela de candidatos (evita conflito de FK)
-        await conn.query(
-            "UPDATE candidates SET curriculumId = NULL WHERE userId = ?",
-            [userId]
-        );
-
-        // 5. Remover o candidato
-        await conn.query("DELETE FROM candidates WHERE userId = ?", [userId]);
-
-        // 6. Remover o usuário
-        await conn.query("DELETE FROM users WHERE id = ?", [userId]);
-
-        return { message: "Dados excluídos com sucesso." };
-    } catch (error) {
-        console.error("Erro ao excluir dados:", error);
-        throw new Error("Erro ao excluir dados do candidato");
-    }
+    return result.affectedRows ? { userId, ...candidate } : null;
 };
 
 module.exports = {
     getAll,
+    createCandidate,
     getByUserId,
     getById,
-    createCandidate,
     updateCandidate,
-    deleteCandidate,
-    addCurriculum,
-    deleteCandidateData,
 };
