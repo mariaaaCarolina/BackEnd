@@ -41,7 +41,11 @@ const createCompany = async (req, res) => {
         const newCompany = await companyModel.createCompany(req.body);
         return res.status(201).json(newCompany);
     } catch (error) {
-        return res.status(500).json({ error: "Erro ao criar empresa." });
+        console.error("Erro ao criar empresa:", error.message, error.stack);
+        return res.status(500).json({
+            error: "Erro ao criar empresa.",
+            details: error.message,
+        });
     }
 };
 
