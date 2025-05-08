@@ -76,15 +76,23 @@ const createCompany = async (company) => {
             userId,
         } = company;
 
+        // Validação simples dos campos obrigatórios
+        if (!name || !cnpj || !address || !phoneNumber || !userId) {
+            throw new Error(
+                "Campos obrigatórios ausentes: name, cnpj, address, phoneNumber, userId"
+            );
+        }
+
+        // Criptografa os dados (url é opcional)
         const encryptedName = encrypt(name);
         const encryptedCnpj = encrypt(cnpj);
         const encryptedAddress = encrypt(address);
         const encryptedPhoneNumber = encrypt(phoneNumber);
-        const encryptedUrl = encrypt(url);
+        const encryptedUrl = url ? encrypt(url) : null;
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, phoneNumber, city, cep, address, addressNumber, uf, url, logo, userId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 encryptedName,
                 encryptedCnpj,
@@ -101,10 +109,11 @@ const createCompany = async (company) => {
                 userId,
             ]
         );
+
         return { userId: result.insertId, ...company };
     } catch (error) {
-        console.error("Erro ao criar a empresa:", error.message);
-        throw new Error("Erro ao criar a empresa");
+        console.error("Erro ao criar a empresa:", error.message, error.stack);
+        throw new Error(`Erro ao criar a empresa: ${error.message}`);
     }
 };
 
