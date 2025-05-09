@@ -8,25 +8,10 @@ const getAll = async () => {
         const [rows] = await conn.query(
             `SELECT id, email, password, type FROM users`
         );
-
-        const users = rows.map((user) => {
-            try {
-                console.log("EMAIL ENCRYPTED FROM DB:", user.email);
-                const decryptedEmail = decrypt(user.email);
-                console.log("EMAIL DECRYPTED:", decryptedEmail);
-                return {
-                    ...user,
-                    email: decryptedEmail,
-                };
-            } catch (err) {
-                console.error(
-                    "Erro ao descriptografar email no getAll:",
-                    err.message
-                );
-                return user; // Retorna o usuário com email original se falhar
-            }
-        });
-
+        const users = rows.map((user) => ({
+            ...user,
+            email: decrypt(user.email),
+        }));
         return users;
     } catch (error) {
         console.error("Database error: ", error);
@@ -39,16 +24,7 @@ const getById = async (id) => {
     const [[user]] = await conn.query("SELECT * FROM users WHERE id = ?", [id]);
 
     if (user) {
-        try {
-            console.log("EMAIL ENCRYPTED FROM DB (getById):", user.email);
-            user.email = decrypt(user.email);
-            console.log("EMAIL DECRYPTED (getById):", user.email);
-        } catch (err) {
-            console.error(
-                "Erro ao descriptografar email no getById:",
-                err.message
-            );
-        }
+        user.email = decrypt(user.email);
     }
 
     return user;
@@ -116,10 +92,28 @@ const deleteUser = async (id) => {
     }
 };
 
+const getByEmail = async (email) => {
+    const conn = await connect();
+    const [rows] = await conn.query("SELECT * FROM users");
+
+    for (const user of rows) {
+        const decryptedEmail = decrypt(user.email);
+        if (decryptedEmail === email) {
+            return {
+                ...user,
+                email: decryptedEmail,
+            };
+        }
+    }
+
+    return null;
+};
+
 module.exports = {
     getAll,
     getById,
     createUser,
     updateUser,
     deleteUser,
+    getByEmail,
 };

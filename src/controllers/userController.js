@@ -1,4 +1,6 @@
 const userModel = require("../models/userModel");
+const bcrypt = require("bcrypt");
+const { generateToken } = require("../jwt");
 
 const getAll = async (req, res) => {
     try {
@@ -24,7 +26,16 @@ const getUserById = async (req, res) => {
 const createUser = async (req, res) => {
     try {
         const newUser = await userModel.createUser(req.body);
-        return res.status(201).json(newUser);
+
+        const token = generateToken({
+            id: newUser.id,
+            type: newUser.type,
+        });
+
+        return res.status(201).json({
+            user: newUser,
+            token,
+        });
     } catch (error) {
         return res.status(500).json({ error: "Erro ao criar usuário." });
     }
@@ -60,10 +71,39 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await userModel.getByEmail(email);
+        if (!user) {
+            return res.status(401).json({ error: "Credenciais inválidas." });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: "Credenciais inválidas." });
+        }
+
+        const token = generateToken({ id: user.id, type: user.type });
+        const userResponse = {
+            id: user.id,
+            email,
+            type: user.type,
+        };
+
+        return res.status(200).json({ user: userResponse, token });
+    } catch (error) {
+        console.error("Erro no login:", error);
+        return res.status(500).json({ error: "Erro ao fazer login." });
+    }
+};
+
 module.exports = {
     getAll,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
+    login,
 };

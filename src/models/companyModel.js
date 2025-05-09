@@ -6,28 +6,17 @@ const getAll = async () => {
         const conn = await connect();
         const [rows] = await conn.query("SELECT * FROM companies");
 
-        const companies = rows.map((company) => {
-            try {
-                return {
-                    ...company,
-                    name: decrypt(company.name),
-                    cnpj: decrypt(company.cnpj),
-                    address: decrypt(company.address),
-                    phoneNumber: decrypt(company.phoneNumber),
-                    url: decrypt(company.url),
-                };
-            } catch (err) {
-                console.error(
-                    "Erro ao descriptografar campos em getAll:",
-                    err.message
-                );
-                return company;
-            }
-        });
-
+        const companies = rows.map((company) => ({
+            ...company,
+            name: decrypt(company.name),
+            cnpj: decrypt(company.cnpj),
+            address: decrypt(company.address),
+            phoneNumber: decrypt(company.phoneNumber),
+            url: decrypt(company.url),
+        }));
         return companies;
     } catch (error) {
-        console.error("Database error em getAll:", error.message);
+        console.error("Database error: ", error);
         throw new Error("Could not retrieve companies");
     }
 };
@@ -40,18 +29,11 @@ const getById = async (userId) => {
     );
 
     if (company) {
-        try {
-            company.name = decrypt(company.name);
-            company.cnpj = decrypt(company.cnpj);
-            company.address = decrypt(company.address);
-            company.phoneNumber = decrypt(company.phoneNumber);
-            company.url = decrypt(company.url);
-        } catch (err) {
-            console.error(
-                "Erro ao descriptografar campos em getById:",
-                err.message
-            );
-        }
+        company.name = decrypt(company.name);
+        company.cnpj = decrypt(company.cnpj);
+        company.address = decrypt(company.address);
+        company.phoneNumber = decrypt(company.phoneNumber);
+        company.url = decrypt(company.url);
     }
 
     return company;
@@ -76,23 +58,15 @@ const createCompany = async (company) => {
             userId,
         } = company;
 
-        // Validação simples dos campos obrigatórios
-        if (!name || !cnpj || !address || !phoneNumber || !userId) {
-            throw new Error(
-                "Campos obrigatórios ausentes: name, cnpj, address, phoneNumber, userId"
-            );
-        }
-
-        // Criptografa os dados (url é opcional)
         const encryptedName = encrypt(name);
         const encryptedCnpj = encrypt(cnpj);
         const encryptedAddress = encrypt(address);
         const encryptedPhoneNumber = encrypt(phoneNumber);
-        const encryptedUrl = url ? encrypt(url) : null;
+        const encryptedUrl = encrypt(url);
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, phoneNumber, city, cep, address, addressNumber, uf, url, logo, userId) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 encryptedName,
                 encryptedCnpj,
@@ -109,11 +83,10 @@ const createCompany = async (company) => {
                 userId,
             ]
         );
-
         return { userId: result.insertId, ...company };
     } catch (error) {
-        console.error("Erro ao criar a empresa:", error.message, error.stack);
-        throw new Error(`Erro ao criar a empresa: ${error.message}`);
+        console.error("Erro ao criar a empresa:", error.message);
+        throw new Error("Erro ao criar a empresa");
     }
 };
 
@@ -169,7 +142,10 @@ const updateCompany = async (userId, company) => {
 
 const deleteCompany = async (userId) => {
     const conn = await connect();
-    const query = `DELETE FROM companies WHERE userId = ?`;
+    const query = `
+        DELETE FROM companies 
+        WHERE userId = ?
+    `;
     const [result] = await conn.query(query, [userId]);
     return result;
 };
@@ -213,6 +189,7 @@ const deleteCompanyData = async (userId) => {
                     .join(",")})`,
                 vacancyIds
             );
+
             await conn.query(
                 `DELETE FROM vacancies WHERE id IN (${vacancyIds
                     .map(() => "?")
@@ -220,8 +197,8 @@ const deleteCompanyData = async (userId) => {
                 vacancyIds
             );
         }
-
         await conn.query("DELETE FROM companies WHERE userId = ?", [userId]);
+
         await conn.query("DELETE FROM users WHERE id = ?", [userId]);
 
         return { message: "Dados excluídos com sucesso." };

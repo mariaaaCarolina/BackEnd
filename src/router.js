@@ -21,6 +21,8 @@ const questionsTestController = require("./controllers/questionsTestController")
 const userTestResultsController = require("./controllers/userTestResultsController");
 require("dotenv").config();
 
+router.post("/login", userController.login);
+
 /**
  * @swagger
  * tags:
