@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("./controllers/userController");
-// const auth = require("./auth");
+const auth = require("./auth");
 const companyController = require("./controllers/companyController");
 const curriculumController = require("./controllers/curriculumController");
 const coursesDataController = require("./controllers/coursesDataController");
@@ -272,15 +272,24 @@ router.post("/login", userController.login);
  */
 
 //Rotas para Usuários
-router.get("/candidates", candidateController.getAll);
-router.get("/candidate/:userId", candidateController.getCandidateByUserId);
-router.get("/candidateid/:id", candidateController.getCandidateById);
-router.post("/candidate", candidateController.createCandidate);
-router.put("/candidate/:userId", candidateController.updateCandidate);
-router.delete("/candidate/:userId", candidateController.deleteCandidate);
-router.put("/candidate/:id/curriculum", candidateController.addCurriculum);
+router.get("/candidates", auth, candidateController.getAll);
+router.get(
+    "/candidate/:userId",
+    auth,
+    candidateController.getCandidateByUserId
+);
+router.get("/candidateid/:id", auth, candidateController.getCandidateById);
+router.post("/candidate", auth, candidateController.createCandidate);
+router.put("/candidate/:userId", auth, candidateController.updateCandidate);
+router.delete("/candidate/:userId", auth, candidateController.deleteCandidate);
+router.put(
+    "/candidate/:id/curriculum",
+    auth,
+    candidateController.addCurriculum
+);
 router.delete(
     "/candidateData/:userId/:curriculumId",
+    auth,
     candidateController.deleteCandidateData
 );
 
@@ -552,12 +561,12 @@ router.delete(
  */
 
 // Rotas para Empresas
-router.get("/companies", companyController.getAll);
-router.get("/companies/:userId", companyController.getCompanyById);
-router.post("/companies", companyController.createCompany);
-router.put("/companies/:userId", companyController.updateCompany);
-router.delete("/companies/:userId", companyController.deleteCompany);
-router.delete("/company/:userId", companyController.deleteCompanyData);
+router.get("/companies", auth, companyController.getAll);
+router.get("/companies/:userId", auth, companyController.getCompanyById);
+router.post("/companies", auth, companyController.createCompany);
+router.put("/companies/:userId", auth, companyController.updateCompany);
+router.delete("/companies/:userId", auth, companyController.deleteCompany);
+router.delete("/company/:userId", auth, companyController.deleteCompanyData);
 
 /**
  * @swagger
@@ -878,16 +887,21 @@ router.delete("/company/:userId", companyController.deleteCompanyData);
  */
 
 // Rotas para curriculum pg1 + dados escolares + pg4
-router.get("/curriculum", curriculumController.getAll);
-router.get("/curriculum/:id", curriculumController.getCurriculumById);
-router.post("/curriculum", curriculumController.createCurriculum);
-router.put("/curriculum/:id", curriculumController.updateCurriculum);
-router.delete("/curriculum/:id", curriculumController.deleteCurriculum);
+router.get("/curriculum", auth, curriculumController.getAll);
+router.get("/curriculum/:id", auth, curriculumController.getCurriculumById);
+router.post("/curriculum", auth, curriculumController.createCurriculum);
+router.put("/curriculum/:id", auth, curriculumController.updateCurriculum);
+router.delete("/curriculum/:id", auth, curriculumController.deleteCurriculum);
 router.put(
     "/curriculum/:userId/addData",
+    auth,
     curriculumController.addDataToCurriculum
 );
-router.put("/curriculum/:id/addSchoolData", curriculumController.addSchoolData);
+router.put(
+    "/curriculum/:id/addSchoolData",
+    auth,
+    curriculumController.addSchoolData
+);
 
 /**
  * @swagger
@@ -992,11 +1006,23 @@ router.put("/curriculum/:id/addSchoolData", curriculumController.addSchoolData);
  */
 
 // Rotas para curriculo (academicData) pg2
-router.get("/academicData", academicDataController.getAll);
-router.get("/academicData/:id", academicDataController.getAcademicDataById);
-router.post("/academicData", academicDataController.createAcademicData);
-router.put("/academicData/:id", academicDataController.updateAcademicData);
-router.delete("/academicData/:id", academicDataController.deleteAcademicData);
+router.get("/academicData", auth, academicDataController.getAll);
+router.get(
+    "/academicData/:id",
+    auth,
+    academicDataController.getAcademicDataById
+);
+router.post("/academicData", auth, academicDataController.createAcademicData);
+router.put(
+    "/academicData/:id",
+    auth,
+    academicDataController.updateAcademicData
+);
+router.delete(
+    "/academicData/:id",
+    auth,
+    academicDataController.deleteAcademicData
+);
 
 /**
  * @swagger
@@ -1258,11 +1284,11 @@ router.delete("/academicData/:id", academicDataController.deleteAcademicData);
  */
 
 //Rotas para curriculo (coursesData) pg3
-router.get("/coursesData", coursesDataController.getAll);
-router.get("/coursesData/:id", coursesDataController.getCoursesDataById);
-router.post("/courseData", coursesDataController.createCourseData);
-router.put("/courseData/:id", coursesDataController.updateCourseData);
-router.delete("/courseData/:id", coursesDataController.deleteCourseData);
+router.get("/coursesData", auth, coursesDataController.getAll);
+router.get("/coursesData/:id", auth, coursesDataController.getCoursesDataById);
+router.post("/courseData", auth, coursesDataController.createCourseData);
+router.put("/courseData/:id", auth, coursesDataController.updateCourseData);
+router.delete("/courseData/:id", auth, coursesDataController.deleteCourseData);
 
 /**
  * @swagger
@@ -1465,11 +1491,11 @@ router.delete("/courseData/:id", coursesDataController.deleteCourseData);
  */
 
 // Rotas para competencias do curriculo //funciona porém nem tanto
-router.get("/competences", competencesController.getAll);
-router.get("/competences/:id", competencesController.getCompetencesById);
-router.post("/competences", competencesController.createCompetence);
-router.put("/competences/:id", competencesController.updateCompetence);
-router.delete("/competences/:id", competencesController.deleteCompetence);
+router.get("/competences", auth, competencesController.getAll);
+router.get("/competences/:id", auth, competencesController.getCompetencesById);
+router.post("/competences", auth, competencesController.createCompetence);
+router.put("/competences/:id", auth, competencesController.updateCompetence);
+router.delete("/competences/:id", auth, competencesController.deleteCompetence);
 
 /**
  * @swagger
@@ -1934,13 +1960,13 @@ router.delete("/competences/:id", competencesController.deleteCompetence);
  */
 
 // Rotas para Vagas
-router.get("/vacancies", vacancyController.getAll);
-router.get("/vacancies/:id", vacancyController.getVacanciesById);
-router.post("/vacancy", vacancyController.createVacancy);
-router.put("/vacancy/:id", vacancyController.updateVacancy);
-router.delete("/vacancy/:id", vacancyController.deleteVacancy);
-router.put("/vacancyIsActive/:id", vacancyController.updateIsActive);
-router.put("/vacancyIsFilled/:id", vacancyController.updateIsFilled);
+router.get("/vacancies", auth, vacancyController.getAll);
+router.get("/vacancies/:id", auth, vacancyController.getVacanciesById);
+router.post("/vacancy", auth, vacancyController.createVacancy);
+router.put("/vacancy/:id", auth, vacancyController.updateVacancy);
+router.delete("/vacancy/:id", auth, vacancyController.deleteVacancy);
+router.put("/vacancyIsActive/:id", auth, vacancyController.updateIsActive);
+router.put("/vacancyIsFilled/:id", auth, vacancyController.updateIsFilled);
 
 /**
  * @swagger
@@ -2203,13 +2229,22 @@ router.put("/vacancyIsFilled/:id", vacancyController.updateIsFilled);
  */
 
 // Rotas para Perguntas da vaga
-router.get("/vacancy/questions", questionsController.getAll);
-router.get("/vacancy/:id/questions/:id", questionsController.getById);
-router.post("/vacancy/questions", questionsController.createQuestion);
-router.put("/vacancy/:id/questions/:id", questionsController.updateQuestion);
-router.delete("/vacancy/:id/questions/:id", questionsController.deleteQuestion);
+router.get("/vacancy/questions", auth, questionsController.getAll);
+router.get("/vacancy/:id/questions/:id", auth, questionsController.getById);
+router.post("/vacancy/questions", auth, questionsController.createQuestion);
+router.put(
+    "/vacancy/:id/questions/:id",
+    auth,
+    questionsController.updateQuestion
+);
+router.delete(
+    "/vacancy/:id/questions/:id",
+    auth,
+    questionsController.deleteQuestion
+);
 router.get(
     "/questions/vacancy/:vacancyId",
+    auth,
     questionsController.getAllByVacancyId
 ); // todas as perguntas relacionas a vaga pelo id
 
@@ -2462,16 +2497,18 @@ router.get(
  */
 
 // Rotas para Candidatura
-router.get("/applications", applicationController.getAll);
-router.get("/applications/:id", applicationController.getApplicationById);
-router.post("/application", applicationController.createApplication);
-router.put("/application/:id", applicationController.updateApplication);
+router.get("/applications", auth, applicationController.getAll);
+router.get("/applications/:id", auth, applicationController.getApplicationById);
+router.post("/application", auth, applicationController.createApplication);
+router.put("/application/:id", auth, applicationController.updateApplication);
 router.delete(
     "/application/:userId/:vacancyId",
+    auth,
     applicationController.deleteApplication
 );
 router.get(
     "/applications/vacancy/:vacancyId",
+    auth,
     applicationController.getApplicationsByVacancyId
 );
 
@@ -2744,13 +2781,14 @@ router.get(
  */
 
 //Rotas para respostas das perguntas da vaga
-router.get("/answers", answersController.getAll);
-router.get("/answer/:id", answersController.getById);
-router.post("/answer", answersController.createAnswer);
-router.put("/answer/:id", answersController.updateAnswer);
-router.delete("/answer/:id", answersController.deleteAnswer);
+router.get("/answers", auth, answersController.getAll);
+router.get("/answer/:id", auth, answersController.getById);
+router.post("/answer", auth, answersController.createAnswer);
+router.put("/answer/:id", auth, answersController.updateAnswer);
+router.delete("/answer/:id", auth, answersController.deleteAnswer);
 router.get(
     "/answers/question/:questionId",
+    auth,
     answersController.getAllByQuestionId
 ); // todas as respostas de uma pergunta x
 
@@ -2977,11 +3015,11 @@ router.get(
  */
 
 //Rotas para as mensagens do chat
-router.get("/messages", messagesController.getAll);
-router.get("/message/:id", messagesController.getById);
-router.post("/message", messagesController.createMessage);
-router.put("/message/:id", messagesController.updateMessage);
-router.delete("/message/:id", messagesController.deleteMessage);
+router.get("/messages", auth, messagesController.getAll);
+router.get("/message/:id", auth, messagesController.getById);
+router.post("/message", auth, messagesController.createMessage);
+router.put("/message/:id", auth, messagesController.updateMessage);
+router.delete("/message/:id", auth, messagesController.deleteMessage);
 
 /**
  * @swagger
@@ -3190,21 +3228,29 @@ router.delete("/message/:id", messagesController.deleteMessage);
  */
 
 //Rotas para candidaturas canceladas
-router.get("/cancelledApplications", cancelledApplicationController.getAll);
+router.get(
+    "/cancelledApplications",
+    auth,
+    cancelledApplicationController.getAll
+);
 router.get(
     "/cancelledApplication/:userId",
+    auth,
     cancelledApplicationController.getCancelledApplicationById
 );
 router.post(
     "/cancelledApplication",
+    auth,
     cancelledApplicationController.createCancelledApplication
 );
 router.put(
     "/cancelledApplication/:id",
+    auth,
     cancelledApplicationController.updateCancelledApplication
 );
 router.delete(
     "/cancelledApplication/:userId/:vacancyId",
+    auth,
     cancelledApplicationController.deleteCancelledApplication
 );
 /**
@@ -3279,8 +3325,8 @@ router.delete(
 router.get("/users", userController.getAll);
 router.get("/user/:id", userController.getUserById);
 router.post("/user", userController.createUser);
-router.put("/user/:id", userController.updateUser);
-router.delete("/user/:id", userController.deleteUser);
+router.put("/user/:id", auth, userController.updateUser);
+router.delete("/user/:id", auth, userController.deleteUser);
 
 router.get("/tests", testsController.getAll);
 router.get("/test/:id", testsController.getById);
