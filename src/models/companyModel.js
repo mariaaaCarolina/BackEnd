@@ -38,7 +38,6 @@ const getById = async (userId) => {
 
     return company;
 };
-
 const createCompany = async (company) => {
     const conn = await connect();
     try {
@@ -66,7 +65,7 @@ const createCompany = async (company) => {
 
         const [result] = await conn.query(
             `INSERT INTO companies (name, cnpj, segment, responsible, phoneNumber, city, cep, address, addressNumber, uf, url, logo, userId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 encryptedName,
                 encryptedCnpj,
@@ -83,7 +82,23 @@ const createCompany = async (company) => {
                 userId,
             ]
         );
-        return { userId: result.insertId, ...company };
+
+        return {
+            id: result.insertId,
+            userId,
+            name,
+            cnpj,
+            segment,
+            responsible,
+            phoneNumber,
+            city,
+            cep,
+            address,
+            addressNumber,
+            uf,
+            url,
+            logo,
+        };
     } catch (error) {
         console.error("Erro ao criar a empresa:", error.message);
         throw new Error("Erro ao criar a empresa");
