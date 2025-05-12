@@ -25,12 +25,16 @@ const getById = async (id) => {
         [id]
     );
 
-    const competence = query[0][0];
-    if (competence) {
-        competence.name = decrypt(competence.name);
-    }
+    const competences = query[0];
 
-    return competence;
+    const decryptedCompetences = competences.map((competence) => {
+        return {
+            ...competence,
+            name: decrypt(competence.name),
+        };
+    });
+
+    return decryptedCompetences;
 };
 
 const createCompetence = async (competenceData) => {
