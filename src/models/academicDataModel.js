@@ -16,19 +16,22 @@ const getAll = async () => {
 
 const getById = async (id) => {
     const conn = await connect();
-    const query = await conn.query(
+    const [rows] = await conn.query(
         "SELECT * FROM academicData WHERE curriculumId = ?",
         [id]
     );
 
-    if (query[0].length > 0) {
-        const data = query[0][0];
-        data.institutionName = decrypt(data.institutionName);
-        data.city = decrypt(data.city);
-        return data;
+    if (!rows || rows.length === 0) {
+        return [];
     }
 
-    return null;
+    const decryptedList = rows.map((data) => ({
+        ...data,
+        institutionName: decrypt(data.institutionName),
+        city: decrypt(data.city),
+    }));
+
+    return decryptedList;
 };
 
 const createAcademicData = async (academicData) => {
