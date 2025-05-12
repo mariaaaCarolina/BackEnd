@@ -112,10 +112,64 @@ const updateCandidate = async (userId, candidate) => {
     return result.affectedRows ? { userId, ...candidate } : null;
 };
 
+const deleteCandidate = async (userId) => {
+    const conn = await connect();
+    try {
+        await conn.query("DELETE FROM messages WHERE sender_id = ?", [userId]);
+        const [result] = await conn.query(
+            "DELETE FROM candidates WHERE userId = ?",
+            [userId]
+        );
+
+        return result;
+    } catch (error) {
+        console.error("Erro ao excluir candidato e suas mensagens:", error);
+        throw new Error("Erro ao excluir candidato e suas mensagens");
+    }
+};
+
+const addCurriculum = async (id, curriculumId) => {
+    const conn = await connect();
+    const query = "UPDATE candidates SET curriculumId = ? WHERE id = ?";
+    const [result] = await conn.query(query, [curriculumId, id]);
+    return result;
+};
+
+const deleteCandidateData = async (userId, curriculumId) => {
+    const conn = await connect();
+    try {
+        await conn.query("DELETE FROM applications WHERE userId = ?", [userId]);
+        await conn.query("DELETE FROM academicData WHERE curriculumId = ?", [
+            curriculumId,
+        ]);
+        await conn.query("DELETE FROM competences WHERE curriculumId = ?", [
+            curriculumId,
+        ]);
+        await conn.query("DELETE FROM coursesData WHERE curriculumId = ?", [
+            curriculumId,
+        ]);
+        await conn.query("DELETE FROM curriculums WHERE id = ?", [
+            curriculumId,
+        ]);
+
+        await conn.query(
+            "UPDATE candidates SET curriculumId = NULL WHERE userId = ?",
+            [userId]
+        );
+        return { message: "Dados excluídos com sucesso." };
+    } catch (error) {
+        console.error("Erro ao excluir dados:", error);
+        throw new Error("Erro ao excluir dados do candidato");
+    }
+};
+
 module.exports = {
     getAll,
     createCandidate,
     getByUserId,
     getById,
     updateCandidate,
+    deleteCandidateData,
+    deleteCandidate,
+    addCurriculum,
 };
