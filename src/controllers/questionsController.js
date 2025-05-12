@@ -15,11 +15,6 @@ const getAllByVacancyId = async (req, res) => {
     const { vacancyId } = req.params;
     try {
         const questions = await questionsModel.getAllByVacancyId(vacancyId);
-        if (questions.length === 0) {
-            return res
-                .status(404)
-                .json({ error: "Nenhuma pergunta encontrada para esta vaga." });
-        }
         return res.status(200).json(questions);
     } catch (error) {
         return res
