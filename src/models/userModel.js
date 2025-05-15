@@ -79,6 +79,62 @@ const updateUser = async (id, user) => {
     }
 };
 
+const updateUserEmail = async (id, user) => {
+    const conn = await connect();
+    try {
+        const { email } = user;
+
+        const encryptedEmail = encrypt(email);
+
+        const query = `
+            UPDATE users 
+            SET email = ?
+            WHERE id = ?
+        `;
+
+        const [result] = await conn.query(query, [encryptedEmail, id]);
+
+        return result.affectedRows ? { id, email } : null;
+    } catch (error) {
+        console.error("Erro ao atualizar usuário: ", error.message);
+        throw new Error("Erro ao atualizar usuário");
+    }
+};
+
+const updateUserPassword = async (id, currentPassword, newPassword) => {
+    const conn = await connect();
+    try {
+        const [[user]] = await conn.query(
+            "SELECT password FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (!user) {
+            throw new Error("Usuário não encontrado");
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+            currentPassword,
+            user.password
+        );
+        if (!isPasswordValid) {
+            throw new Error("Senha atual incorreta");
+        }
+
+        const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const [result] = await conn.query(
+            `UPDATE users SET password = ? WHERE id = ?`,
+            [newHashedPassword, id]
+        );
+
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error("Erro ao atualizar senha: ", error.message);
+        throw new Error(error.message || "Erro ao atualizar senha");
+    }
+};
+
 const deleteUser = async (id) => {
     const conn = await connect();
     try {
@@ -116,4 +172,6 @@ module.exports = {
     updateUser,
     deleteUser,
     getByEmail,
+    updateUserPassword,
+    updateUserEmail,
 };

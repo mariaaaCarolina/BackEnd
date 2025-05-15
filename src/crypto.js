@@ -4,9 +4,6 @@ const algorithm = "aes-256-gcm";
 const key = Buffer.from(process.env.SECRET_KEY, "utf-8");
 
 if (key.length !== 32) {
-    console.log("KEY LENGTH:", key.length);
-    console.log("KEY VALUE:", process.env.SECRET_KEY); // apenas para debug, remova depois
-
     throw new Error("SECRET_KEY inválida. Deve conter 32 bytes.");
 }
 
@@ -55,7 +52,7 @@ function decrypt(data) {
         return decrypted.toString("utf8");
     } catch (err) {
         console.error("Erro ao descriptografar:", err.message);
-        return data; // Retorna o valor original se falhar
+        return data;
     }
 }
 

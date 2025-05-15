@@ -56,6 +56,46 @@ const updateUser = async (req, res) => {
     }
 };
 
+const updateUserEmail = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedData = req.body;
+        const updatedUser = await userModel.updateUserEmail(id, updatedData);
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "Usuário não encontrado." });
+        }
+        return res.status(200).json(updatedUser);
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "Erro ao atualizar email do usuário." });
+    }
+};
+
+const updateUserPassword = async (req, res) => {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    try {
+        const success = await userModel.updateUserPassword(
+            id,
+            currentPassword,
+            newPassword
+        );
+
+        if (!success) {
+            return res.status(400).json({ error: "Falha ao atualizar senha." });
+        }
+
+        return res
+            .status(200)
+            .json({ message: "Senha atualizada com sucesso." });
+    } catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+};
+
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -106,4 +146,6 @@ module.exports = {
     updateUser,
     deleteUser,
     login,
+    updateUserEmail,
+    updateUserPassword,
 };

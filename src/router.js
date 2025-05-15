@@ -3326,6 +3326,8 @@ router.get("/users", userController.getAll);
 router.get("/user/:id", userController.getUserById);
 router.post("/user", userController.createUser);
 router.put("/user/:id", auth, userController.updateUser);
+router.put("/userUpdateEmail/:id", auth, userController.updateUserEmail);
+router.put("/userUpdatePassword/:id", auth, userController.updateUserPassword);
 router.delete("/user/:id", auth, userController.deleteUser);
 
 router.get("/tests", testsController.getAll);
