@@ -80,6 +80,27 @@ const updateCompany = async (req, res) => {
     }
 };
 
+const updateIsPremium = async (req, res) => {
+    const { userId } = req.params;
+    const { isPremium } = req.body;
+
+    if (typeof isPremium !== "boolean") {
+        return res
+            .status(400)
+            .json({ error: "O campo 'isPremium' deve ser um valor booleano." });
+    }
+
+    try {
+        const result = await companyModel.updateIsPremium(userId, isPremium);
+        res.status(200).json({
+            message: `Status da empresa com ID ${userId} atualizado com sucesso.`,
+            company: result,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 const deleteCompany = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -113,4 +134,5 @@ module.exports = {
     updateCompany,
     deleteCompany,
     deleteCompanyData,
+    updateIsPremium,
 };

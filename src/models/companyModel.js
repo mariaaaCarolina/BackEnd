@@ -155,6 +155,28 @@ const updateCompany = async (userId, company) => {
     return result.affectedRows ? { userId, ...company } : null;
 };
 
+const updateIsPremium = async (userId, isPremium) => {
+    const conn = await connect();
+    try {
+        const [result] = await conn.query(
+            `UPDATE companies SET isPremium = ? WHERE userId = ?;`,
+            [isPremium, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            throw new Error(`Empresa com ID ${userId} não encontrada.`);
+        }
+
+        return { userId, isPremium };
+    } catch (error) {
+        console.error(
+            "Erro ao atualizar o status da empresa para premium:",
+            error.message
+        );
+        throw new Error("Erro ao atualizar o status da empresa para premium.");
+    }
+};
+
 const deleteCompany = async (userId) => {
     const conn = await connect();
     const query = `
@@ -230,4 +252,5 @@ module.exports = {
     updateCompany,
     deleteCompany,
     deleteCompanyData,
+    updateIsPremium,
 };
