@@ -20,8 +20,8 @@ const testsController = require("./controllers/testsController");
 const questionsTestController = require("./controllers/questionsTestController");
 const userTestResultsController = require("./controllers/userTestResultsController");
 require("dotenv").config();
-const upload = require("./middlewares/upload");
-const { processCV } = require("./controllers/cvController");
+// const upload = require("./middlewares/upload");
+// const { processCV } = require("./controllers/cvController");
 const dashboardController = require("./controllers/dashboardController");
 
 // --- Rotas de Dashboard ---
@@ -72,7 +72,7 @@ router.get(
     dashboardController.getChartUserResumeRelation
 );
 
-router.post("/avaliar-cv", upload.single("cv"), processCV);
+// router.post("/avaliar-cv", upload.single("cv"), processCV);
 
 router.post("/login", userController.login);
 
