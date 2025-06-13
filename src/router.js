@@ -20,6 +20,59 @@ const testsController = require("./controllers/testsController");
 const questionsTestController = require("./controllers/questionsTestController");
 const userTestResultsController = require("./controllers/userTestResultsController");
 require("dotenv").config();
+const upload = require("./middlewares/upload");
+const { processCV } = require("./controllers/cvController");
+const dashboardController = require("./controllers/dashboardController");
+
+// --- Rotas de Dashboard ---
+// Prefixo para as rotas do dashboard: /dashboard
+// KPIs
+router.get(
+    "/dashboard/kpi/applications",
+
+    dashboardController.getKpiApplications
+);
+router.get(
+    "/dashboard/kpi/companies",
+    auth,
+    dashboardController.getKpiCompanies
+);
+router.get("/dashboard/kpi/resumes", auth, dashboardController.getKpiResumes);
+router.get(
+    "/dashboard/kpi/vacancies",
+    auth,
+    dashboardController.getKpiVacancies
+);
+router.get("/dashboard/kpi/users", auth, dashboardController.getKpiUsers);
+
+// Gráficos
+router.get(
+    "/dashboard/chart/company-segments",
+    auth,
+    dashboardController.getChartCompanySegments
+);
+router.get(
+    "/dashboard/chart/candidate-ages",
+    auth,
+    dashboardController.getChartCandidateAges
+);
+router.get(
+    "/dashboard/chart/vacancy-seniority",
+    auth,
+    dashboardController.getChartVacancySeniority
+);
+router.get(
+    "/dashboard/chart/company-candidate-relation",
+    auth,
+    dashboardController.getChartCompanyCandidateRelation
+);
+router.get(
+    "/dashboard/chart/user-resume-relation",
+    auth,
+    dashboardController.getChartUserResumeRelation
+);
+
+router.post("/avaliar-cv", upload.single("cv"), processCV);
 
 router.post("/login", userController.login);
 

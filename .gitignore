@@ -5,3 +5,8 @@ node_modules
 
 
 .vercel
+process_cv.py
+groq_client.py
+cvController.js
+middlewares/
+uploads/
