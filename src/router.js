@@ -29,46 +29,32 @@ const dashboardController = require("./controllers/dashboardController");
 // KPIs
 router.get(
     "/dashboard/kpi/applications",
-
     dashboardController.getKpiApplications
 );
-router.get(
-    "/dashboard/kpi/companies",
-    auth,
-    dashboardController.getKpiCompanies
-);
-router.get("/dashboard/kpi/resumes", auth, dashboardController.getKpiResumes);
-router.get(
-    "/dashboard/kpi/vacancies",
-    auth,
-    dashboardController.getKpiVacancies
-);
-router.get("/dashboard/kpi/users", auth, dashboardController.getKpiUsers);
+router.get("/dashboard/kpi/companies", dashboardController.getKpiCompanies);
+router.get("/dashboard/kpi/resumes", dashboardController.getKpiResumes);
+router.get("/dashboard/kpi/vacancies", dashboardController.getKpiVacancies);
+router.get("/dashboard/kpi/users", dashboardController.getKpiUsers);
 
 // Gráficos
 router.get(
     "/dashboard/chart/company-segments",
-    auth,
     dashboardController.getChartCompanySegments
 );
 router.get(
     "/dashboard/chart/candidate-ages",
-    auth,
     dashboardController.getChartCandidateAges
 );
 router.get(
     "/dashboard/chart/vacancy-seniority",
-    auth,
     dashboardController.getChartVacancySeniority
 );
 router.get(
     "/dashboard/chart/company-candidate-relation",
-    auth,
     dashboardController.getChartCompanyCandidateRelation
 );
 router.get(
     "/dashboard/chart/user-resume-relation",
-    auth,
     dashboardController.getChartUserResumeRelation
 );
 
