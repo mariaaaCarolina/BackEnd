@@ -94,10 +94,30 @@ const getChartCandidateAges = async (req, res) => {
 const getChartVacancySeniority = async (req, res) => {
     try {
         const conn = await connect();
-        const [rows] = await conn.query(
-            "SELECT level AS senioridade, COUNT(*) AS quantidade FROM vacancies GROUP BY level ORDER BY quantidade DESC;"
-        );
-        return res.status(200).json(rows);
+        const [rows] = await conn.query("SELECT level FROM vacancies;");
+
+        const decryptedLevelsCount = {};
+        for (const row of rows) {
+            if (row.level) {
+                const decryptedLevel = decrypt(row.level);
+                decryptedLevelsCount[decryptedLevel] =
+                    (decryptedLevelsCount[decryptedLevel] || 0) + 1;
+            }
+        }
+        const chartData = Object.keys(decryptedLevelsCount).map((level) => ({
+            senioridade: level,
+            quantidade: decryptedLevelsCount[level],
+        }));
+
+        chartData.sort((a, b) => {
+            // // Exemplo de ordenação específica para senioridade:
+            // const order = { 'Jovem Aprendiz': 1, 'Estágio': 2, 'Pleno': 3, 'Sênior': 4, 'Especialista': 5, 'Líder': 6 };
+            // return (order[a.senioridade] || 99) - (order[b.senioridade] || 99);
+            // Se você não tiver uma ordem específica, pode ordenar por quantidade:
+            return b.quantidade - a.quantidade; // Maior para menor
+        });
+
+        return res.status(200).json(chartData);
     } catch (error) {
         console.error("Erro ao buscar senioridade das vagas (Gráfico):", error);
         return res.status(500).json({ error: "Erro interno do servidor." });
