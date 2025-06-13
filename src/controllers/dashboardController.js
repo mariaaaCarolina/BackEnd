@@ -1,4 +1,4 @@
-const connect = require("../connection"); // Conecta diretamente ao DB
+const connect = require("../connection");
 
 // Funções para os KPIs
 const getKpiApplications = async (req, res) => {
@@ -30,9 +30,8 @@ const getKpiCompanies = async (req, res) => {
 const getKpiResumes = async (req, res) => {
     try {
         const conn = await connect();
-        // Ajuste a query se sua tabela de currículos for diferente ou se 'candidateId' não é o total direto.
         const [rows] = await conn.query(
-            "SELECT COUNT(DISTINCT candidateId) AS total FROM applications;"
+            "SELECT COUNT(*) AS total FROM curriculums;"
         );
         return res.status(200).json(rows[0].total);
     } catch (error) {
@@ -70,7 +69,7 @@ const getChartCompanySegments = async (req, res) => {
     try {
         const conn = await connect();
         const [rows] = await conn.query(
-            "SELECT segmento, COUNT(*) AS quantidade FROM companies GROUP BY segmento ORDER BY quantidade DESC;"
+            "SELECT segment AS segmento, COUNT(*) AS quantidade FROM companies GROUP BY segment ORDER BY quantidade DESC;"
         );
         return res.status(200).json(rows);
     } catch (error) {
@@ -83,7 +82,7 @@ const getChartCandidateAges = async (req, res) => {
     try {
         const conn = await connect();
         const [rows] = await conn.query(
-            "SELECT idade, COUNT(*) AS quantidade FROM candidates GROUP BY idade ORDER BY idade ASC;"
+            "SELECT age AS idade, COUNT(*) AS quantidade FROM curriculums GROUP BY age ORDER BY age ASC;"
         );
         return res.status(200).json(rows);
     } catch (error) {
@@ -96,7 +95,7 @@ const getChartVacancySeniority = async (req, res) => {
     try {
         const conn = await connect();
         const [rows] = await conn.query(
-            "SELECT senioridade, COUNT(*) AS quantidade FROM vacancies GROUP BY senioridade ORDER BY quantidade DESC;"
+            "SELECT level AS senioridade, COUNT(*) AS quantidade FROM vacancies GROUP BY level ORDER BY quantidade DESC;"
         );
         return res.status(200).json(rows);
     } catch (error) {
@@ -112,7 +111,7 @@ const getChartCompanyCandidateRelation = async (req, res) => {
             "SELECT COUNT(*) AS total FROM companies;"
         );
         const [candidatesCount] = await conn.query(
-            "SELECT COUNT(*) AS total FROM candidates;"
+            "SELECT COUNT(*) AS total FROM curriculums;"
         );
         return res.status(200).json({
             companies: companiesCount[0].total,
@@ -134,8 +133,8 @@ const getChartUserResumeRelation = async (req, res) => {
             "SELECT COUNT(*) AS total FROM users;"
         );
         const [resumesCount] = await conn.query(
-            "SELECT COUNT(*) AS total FROM candidates;"
-        ); // Ou 'resumes' se for uma tabela separada
+            "SELECT COUNT(*) AS total FROM curriculums;"
+        );
         return res.status(200).json({
             users: usersCount[0].total,
             resumes: resumesCount[0].total,
