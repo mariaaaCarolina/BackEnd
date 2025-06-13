@@ -1,4 +1,5 @@
 const connect = require("../connection");
+const { decrypt } = require("../crypto");
 
 // Funções para os KPIs
 const getKpiApplications = async (req, res) => {
